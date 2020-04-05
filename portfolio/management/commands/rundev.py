@@ -7,6 +7,6 @@ class Command(SubprocessCommand):
     commands = [
         'cd portfolio/reactserver ; npm run build:devserver',
         'cd portfolio/reactserver ; npm run build:devclient',
-        'cd portfolio/reactserver ; ' + settings.REACTSERVER_ENV('development') + ' npm run start:server',
-        'python manage.py runserver',
+        'cd portfolio/reactserver ; ' + settings.REACTSERVER_ENV('development') + ' npm run watch:server',
+        'python3 manage.py runserver',
     ]

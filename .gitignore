@@ -1,3 +1,5 @@
 ec2-django-bitnami.pem
 node_modules/
 .idea/
+reactserver/dist/
+.env

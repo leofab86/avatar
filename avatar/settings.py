@@ -25,7 +25,7 @@ SECRET_KEY = '_=op516*)+rmgir8_*u$d0%!am8wq*3q*k9(pcwn$)0k5cz)wu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'avatar',
         'USER': 'avataradmin',
         'PASSWORD': 'leofab86',
-        'HOST': 'localhost',
+        'HOST': '/opt/bitnami/postgresql',
         'PORT': '5432',
     }
 }
