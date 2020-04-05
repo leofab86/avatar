@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PATH="$PATH:/opt/bitnami/nodejs/bin"
+
+source .env
+
+NODE_ENVS="NODE_HOST=$REACTSERVER_HOST NODE_PORT=$REACTSERVER_PORT NODE_ENV=production"
+
+cd portfolio/reactserver
+npm run build:client
+npm run build:server
+eval "$NODE_ENVS npm run start:server"
