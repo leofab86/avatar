@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d0bc040c-1cbe-4890-89be-5c47b7cfcb06" name="aws-django-bitnami" url="http://ec2-3-222-245-218.compute-1.amazonaws.com">
+        <fileTransfer host="ec2-3-222-245-218.compute-1.amazonaws.com" port="22" privateKey="$PROJECT_DIR$/ec2-django-bitnami.pem" rootFolder="/home/bitnami" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

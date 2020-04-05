@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block headerscripts %}
+<script>
+    window.__data__ = '{{ data|escapejs }}'
+</script>
+<script type="text/javascript" src="{% static 'client.bundle.js' %}" async></script>
+<link rel="stylesheet" type="text/css" href="{% static 'bundle.css' %}">
+{% endblock %}
+
+{% block body %}
+<h2>Portfolio</h2>
+<div id="root">{{ html|safe }}</div>
+{% endblock %}
