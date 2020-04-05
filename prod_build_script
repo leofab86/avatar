@@ -1,12 +1,8 @@
 #!/bin/bash
 
-PATH="$PATH:/opt/bitnami/nodejs/bin:/opt/bitnami/git/bin:/opt/bitnami/python/bin"
+source /home/bitnami/.bashrc
 
 cd /home/bitnami/apps/django/django_projects/avatar
-
-source .env
-
-NODE_ENVS="NODE_HOST=$REACTSERVER_HOST NODE_PORT=$REACTSERVER_PORT NODE_ENV=production"
 
 git fetch
 git reset --hard origin/master
@@ -16,6 +12,6 @@ pip install -r requirements.txt
 
 cd portfolio/reactserver
 npm install
-npm run build:client
-npm run build:server
-eval "$NODE_ENVS npm run start:server"
+
+cd /home/bitnami/apps/django/django_projects/avatar
+python3 manage.py runprod
