@@ -1,6 +1,11 @@
 # Todo
+• transfer githubs
+
 • work on environment variables (Python decouple, using
 .env file instead of REACTSERVER_ENV method)
+
+• update custom commands for dev environment and prod preview
+
 • consider implementations for persisting SPA state through
 refreshes (localStorage, cookies, external session manager
 like redis)
