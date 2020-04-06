@@ -1,17 +1,21 @@
 #!/bin/bash
 
 source /home/bitnami/.bashrc
+source /opt/bitnami/python/.virtualenvs/avatar/bin/activate
 
 cd /home/bitnami/apps/django/django_projects/avatar
 
 git fetch
 git reset --hard origin/master
 
-source /opt/bitnami/python/.virtualenvs/avatar/bin/activate
 pip install -r requirements.txt
 
 cd portfolio/reactserver
 npm install
+npm run build:server
+npm run build:client
+
 
 cd /home/bitnami/apps/django/django_projects/avatar
-python3 manage.py runprod
+python3 manage.py collectstatic --noinput
+python3 manage.py runreactserver
