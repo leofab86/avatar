@@ -3,10 +3,11 @@ from portfolio.management.commandclasses import SubprocessCommand
 
 
 class Command(SubprocessCommand):
-    help = 'Runs all dev servers necessary to work on Portfolio app'
+    help = 'Builds Portfolio distribution files and run reactserver'
     commands = [
-        'cd portfolio/reactserver ; npm run build:devserver',
-        'cd portfolio/reactserver ; npm run build:devclient',
-        'cd portfolio/reactserver ; ' + settings.REACTSERVER_ENV('development') + ' npm run watch:server',
-        'python3 manage.py runserver',
+        'cd portfolio/reactserver ;' +
+        'npm run build:server ; ' +
+        'npm run build:client ; ' +
+        'python3 manage.py collectstatic ; ' +
+        settings.REACTSERVER_ENV('production') + ' npm run start:server',
     ]
