@@ -4,3 +4,4 @@ node_modules/
 .env
 /portfolio/reactserver/dist/
 .static/
+__pycache__/
