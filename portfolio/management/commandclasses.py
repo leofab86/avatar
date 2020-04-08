@@ -10,8 +10,10 @@ class SubprocessCommand(BaseCommand):
     def handle(self, *args, **keywargs):
         proc_list = []
 
+        print(' ')
+        print('RUNNING: ')
         for command in self.commands:
-            print('RUNNING: ' + command)
+            print('  ' + command)
             proc = {
                 'command': command,
                 'process': Popen(command, shell=True, stdin=stdin, stdout=stdout, stderr=stderr),
@@ -21,6 +23,7 @@ class SubprocessCommand(BaseCommand):
         try:
             for proc in proc_list:
                 proc['process'].wait()
+                print(' ')
                 print('COMPLETE: ' + proc['command'])
             exit()
 
