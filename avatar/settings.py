@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_=op516*)+rmgir8_*u$d0%!am8wq*3q*k9(pcwn$)0k5cz)wu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,7 +82,7 @@ DATABASES = {
         'NAME': 'avatar',
         'USER': 'avataradmin',
         'PASSWORD': 'leofab86',
-        'HOST': '/opt/bitnami/postgresql',
+        'HOST': config('DB_HOST'),
         'PORT': '5432',
     }
 }
@@ -136,10 +137,8 @@ REACTSERVER = {
     'PORT': '8005',
 }
 
+REACTSERVER_PATH = 'portfolio/reactserver'
+
 REACTSERVER_URL = 'http://' + REACTSERVER['HOST'] + ':' + REACTSERVER['PORT']
 
-
-def REACTSERVER_ENV(env):
-    return 'NODE_HOST=' + REACTSERVER['HOST'] + \
-            ' NODE_PORT=' + REACTSERVER['PORT'] + \
-            ' NODE_ENV=' + env
+REACTSERVER_ENV = 'NODE_HOST=' + REACTSERVER['HOST'] + ' NODE_PORT=' + REACTSERVER['PORT']
