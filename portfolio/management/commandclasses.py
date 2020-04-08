@@ -1,28 +1,39 @@
 from django.core.management.base import BaseCommand
 
 from subprocess import Popen
-from sys import stdout, stdin, stderr
-import time, os, signal
+from sys import stdout, stdin, stderr, exit
 
 
 class SubprocessCommand(BaseCommand):
+    commands = []
 
     def handle(self, *args, **keywargs):
         proc_list = []
 
+        print(' ')
+        print('RUNNING: ')
         for command in self.commands:
-            print('Running: ' + command)
-            proc_list.append({
+            print('  ' + command)
+            proc = {
                 'command': command,
-                'process': Popen(command, shell=True, stdin=stdin, stdout=stdout, stderr=stderr)
-            })
+                'process': Popen(command, shell=True, stdin=stdin, stdout=stdout, stderr=stderr),
+                'complete': False
+            }
+            proc_list.append(proc)
 
         try:
-            while True:
-                time.sleep(10)
+            for proc in proc_list:
+                proc['process'].wait()
+                print(' ')
+                print('COMPLETE: ' + proc['command'])
+                print(' ')
+                proc['complete'] = True
+            exit()
+
         except KeyboardInterrupt:
             print(' ')
-            print('KILLING PROCESSES STARTED BY THESE COMMANDS: ')
+            print('KILLING: ')
             for proc in proc_list:
-                print('  ' + proc['command'])
-                os.kill(proc['process'].pid, signal.SIGKILL)
+                if not proc['complete']:
+                    print('  ' + proc['command'])
+            exit()
