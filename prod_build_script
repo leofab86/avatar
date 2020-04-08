@@ -10,12 +10,6 @@ git reset --hard origin/master
 
 pip install -r requirements.txt
 
-cd portfolio/reactserver
-npm install
-npm run build:server
-npm run build:client
-
-
-cd /home/bitnami/apps/django/django_projects/avatar
+python3 manage.py buildreactserver
 python3 manage.py collectstatic --noinput
 python3 manage.py runreactserver

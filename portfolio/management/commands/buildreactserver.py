@@ -3,8 +3,10 @@ from portfolio.management.commandclasses import SubprocessCommand
 
 
 class Command(SubprocessCommand):
-    help = 'Runs Portfolio reactserver'
+    help = 'Builds Portfolio distribution files'
     commands = [
         f'cd {settings.REACTSERVER_PATH} ; ' +
-        settings.REACTSERVER_ENV + ' npm run start:server',
+        'npm install ; ' +
+        'npm run build:server ; ' +
+        'npm run build:client'
     ]

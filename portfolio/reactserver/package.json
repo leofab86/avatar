@@ -8,8 +8,8 @@
     "build:devclient": "webpack --mode=development --config webpack/webpack.config.client.js",
     "build:server": "webpack --mode=production --config webpack/webpack.config.server.js",
     "build:client": "webpack --mode=production --config webpack/webpack.config.client.js",
-    "watch:server": "nodemon ./dist/server.bundle.js",
-    "start:server": "node ./dist/server.bundle.js"
+    "watch:server": "NODE_ENV=development nodemon ./dist/server.bundle.js",
+    "start:server": "NODE_ENV=production node ./dist/server.bundle.js"
   },
   "author": "",
   "license": "ISC",
