@@ -17,6 +17,7 @@ class SubprocessCommand(BaseCommand):
             proc = {
                 'command': command,
                 'process': Popen(command, shell=True, stdin=stdin, stdout=stdout, stderr=stderr),
+                'complete': False
             }
             proc_list.append(proc)
 
@@ -25,11 +26,14 @@ class SubprocessCommand(BaseCommand):
                 proc['process'].wait()
                 print(' ')
                 print('COMPLETE: ' + proc['command'])
+                print(' ')
+                proc['complete'] = True
             exit()
 
         except KeyboardInterrupt:
             print(' ')
             print('KILLING: ')
             for proc in proc_list:
-                print('  ' + proc['command'])
-                exit()
+                if not proc['complete']:
+                    print('  ' + proc['command'])
+            exit()
