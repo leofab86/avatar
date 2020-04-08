@@ -3,5 +3,5 @@ node_modules/
 .idea/
 .env
 /portfolio/reactserver/dist/
-.static/
+static/
 __pycache__/
