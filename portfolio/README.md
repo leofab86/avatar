@@ -1,19 +1,8 @@
 # Todo
-• transfer githubs
-
-• work on environment variables (Python decouple, using
-.env file instead of REACTSERVER_ENV method)
-
-• update custom commands for dev environment and prod preview
-
-• consider implementations for persisting SPA state through
-refreshes (localStorage, cookies, external session manager
-like redis)
-
-# Roadmap
 • see if you can create separate app that can bombard your
 ec2 server with requests to eventually use in profile app
 
+# Roadmap
 • portfolio home page is list of large, full width banners
 representing individual parts of my portfolio that will 
 eventually have a cool 3d or 2d animation in each banner
