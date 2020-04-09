@@ -12,5 +12,4 @@ pip install -r requirements.txt
 
 python3 manage.py buildreactserver
 python3 manage.py collectstatic --noinput
-python3 manage.py runreactserver &
-echo $!
+python3 manage.py runreactserver
