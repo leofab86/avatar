@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'reactserver.apps.ReactserverConfig',
+    'profiler.apps.ProfilerConfig',
     'portfolio.apps.WebsiteConfig',
     'rest_framework',
     'django.contrib.admin',
@@ -125,7 +127,7 @@ REACTSERVER = {
     'PORT': config('REACTSERVER_PORT', default='8005'),
 }
 
-REACTSERVER_PATH = 'portfolio/reactserver'
+REACTSERVER_PATH = 'reactserver/js'
 
 REACTSERVER_URL = 'http://' + REACTSERVER['HOST'] + ':' + REACTSERVER['PORT']
 

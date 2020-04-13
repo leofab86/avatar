@@ -2,8 +2,7 @@ from django.urls import path
 
 from . import views
 
-app_name = 'reactserver'
+app_name = 'profiler'
 urlpatterns = [
     path('', views.home, name='home'),
-    path('details/<int:project_id>', views.details, name='details')
 ]

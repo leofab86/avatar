@@ -1,5 +1,5 @@
 from django.conf import settings
-from portfolio.management.commandclasses import SubprocessCommand
+from reactserver.management.commandclasses import SubprocessCommand
 
 install_and_build = f'cd {settings.REACTSERVER_PATH} ; ' + \
     'npm install ; ' + \
