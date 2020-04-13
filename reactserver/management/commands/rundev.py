@@ -1,5 +1,5 @@
 from django.conf import settings
-from portfolio.management.commandclasses import SubprocessCommand
+from reactserver.management.commandclasses import SubprocessCommand
 
 
 class Command(SubprocessCommand):

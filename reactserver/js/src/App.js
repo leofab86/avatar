@@ -26,6 +26,10 @@ export default function App ({ store, staticRouterProps }) {
                     <Route path='/details/:projectId'>
                         <DetailsPage />
                     </Route>
+
+                    <Route path='/profiler' exact>
+                        <Home />
+                    </Route>
                 </Switch>
             )}
         </StoreProvider>

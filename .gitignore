@@ -2,6 +2,6 @@ ec2-django-bitnami.pem
 node_modules/
 .idea/
 .env
-/portfolio/reactserver/dist/
+/reactserver/js/dist/
 static/
 __pycache__/
