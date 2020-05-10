@@ -1,4 +1,9 @@
 # Todo
+• Set up skeleton of profile app that allows creation of 
+database table sets associated with current session. Each
+session would have Teachers, Classes, Students. User can
+select how many of each to model system complexity
+
 • see if you can create separate app that can bombard your
 ec2 server with requests to eventually use in profile app
 
@@ -25,6 +30,7 @@ profiling app:
   necessary and load balancer to manage them and some 
   way to artificially test load on it
   • add redis for cache 
+  • multiple replicated database instances? (ask Tony)
   • wrapping previous implementation in docker
   • serverless architecture
 ]

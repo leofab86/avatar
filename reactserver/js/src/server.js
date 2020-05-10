@@ -20,7 +20,7 @@ app.use(bodyParser.json({ limit: '10mb' }))
 developmentMode && (
   app.use(function logger (req, res, next) {
     console.log(`REACTSERVER request: ${req.method} ${req.originalUrl}`)
-    console.log(req.body)
+    // console.log(req.body)
     next()
   })
 )

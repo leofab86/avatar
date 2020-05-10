@@ -1,13 +1,13 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
 import { useStore } from 'store';
-import { useHydrateStoreOnPageLoad } from 'utils/customHooks.js';
+import { useHydrateStoreOnPageLoad } from 'actions';
 // import styles from './styles.scss';
 
 
 export default function DetailsPage () {
-    const { get } = useStore();
-    const project = get('project');
+    const { getFromStore } = useStore();
+    const project = getFromStore('project');
     const { projectId } = useParams();
     const projectNotLoaded = !project || project.id.toString() !== projectId;
 

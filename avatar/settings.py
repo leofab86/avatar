@@ -26,25 +26,46 @@ SECRET_KEY = '_=op516*)+rmgir8_*u$d0%!am8wq*3q*k9(pcwn$)0k5cz)wu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
+# Set up a custom callback here that determines weather to show the Debug toolbar in production
+# SHOW_TOOLBAR_CALLBACK =
+
+DEBUG_TOOLBAR_PANELS = [
+    # 'debug_toolbar.panels.versions.VersionsPanel',
+    # 'debug_toolbar.panels.timer.TimerPanel',
+    # 'debug_toolbar.panels.settings.SettingsPanel',
+    # 'debug_toolbar.panels.headers.HeadersPanel',
+    # 'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    # 'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    # 'debug_toolbar.panels.templates.TemplatesPanel',
+    # 'debug_toolbar.panels.cache.CachePanel',
+    # 'debug_toolbar.panels.signals.SignalsPanel',
+    # 'debug_toolbar.panels.logging.LoggingPanel',
+    # 'debug_toolbar.panels.redirects.RedirectsPanel',
+    # 'debug_toolbar.panels.profiling.ProfilingPanel',
+]
+
 ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'reactserver.apps.ReactserverConfig',
+    'rest_framework',
+    'reactserver.apps.ReactServerConfig',
     'profiler.apps.ProfilerConfig',
     'portfolio.apps.WebsiteConfig',
-    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +76,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'avatar.urls'
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 
 TEMPLATES = [
     {
@@ -83,11 +108,21 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'avatar',
         'USER': 'avataradmin',
-        'PASSWORD': 'leofab86',
+        'PASSWORD': config('AVATARADMIN_PASS', default='admin'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': '5432',
+    },
+    'profiler': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'profiler',
+        'USER': 'profileradmin',
+        'PASSWORD': config('PROFILEADMIN_PASS', default='admin'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': '5432',
     }
 }
+
+DATABASE_ROUTERS = ['profiler.dbrouter.ProfilerRouter']
 
 
 # Password validation
