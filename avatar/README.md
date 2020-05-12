@@ -1,11 +1,4 @@
 # Todo
-• Set up skeleton of profile app that allows creation of 
-database table sets associated with current session. Each
-session would have Teachers, Classes, Students. User can
-select how many of each to model system complexity
-
-• fill out db profile creation to generate random names
-
 • Solve the django ORM query problem
 
 • set up django_toolbar to show in prod

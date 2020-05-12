@@ -69,7 +69,7 @@ def request_validation(methods, *, expected_body=None):
                             status=400
                         )
                     try:
-                        # data is expected to be a dict using serializer fields which have the to_internal_value method
+                        # expected_body should be a dict using serializer fields which have the to_internal_value method
                         # that will raise a serializers.ValidationError if request body doesn't match serializer fields
                         expected_body[key].to_internal_value(request_body[key])
                     except Exception as e:

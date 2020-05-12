@@ -8,6 +8,20 @@ class_type_names = [
     'Computer Science', 'Theater', 'Art', 'Philosophy', 'Law', 'Business', 'Nursing', 'Medicine'
 ]
 
+first_names = [
+    'Billy', 'Bob', 'Joe', 'Leo', 'Casey', 'Jenny', 'Mark', 'Amanda', 'Sophia', 'Maria', 'Natasha', 'Nicole', 'Sarah',
+    'Juliana', 'Carol', 'James', 'Robert', 'John', 'Mike', 'Charles', 'Emma', 'Olivia', 'Isabella', 'Amelia', 'Jessica',
+]
+
+last_names = [
+    'Smith', 'Hall', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson',
+    'Thomas', 'Jackson', 'White', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green'
+]
+
+
+def generate_name():
+    return f'{first_names[random.randint(0, len(first_names) - 1)]} {last_names[random.randint(0, len(last_names) - 1)]}'
+
 
 class DatabaseProfile(models.Model):
     db_profile_name = models.CharField(max_length=200)
@@ -59,7 +73,7 @@ class Teacher(models.Model):
         while len(teacher_list) < total_teachers:
             teacher = Teacher(
                 db_profile=db_profile,
-                teacher_name='Billy_Bob'
+                teacher_name=generate_name()
             )
             teacher.save()
             teacher_list.append(teacher)
@@ -76,7 +90,10 @@ class Class(models.Model):
     @staticmethod
     def save_class_set(*, db_profile, total_classes, teacher_list, classes_per_teacher, class_types):
         class_list = []
-        random_class_type_sample = random.sample(class_type_names, class_types)
+        random_class_type_sample = random.sample(
+            class_type_names,
+            class_types if class_types <= len(class_type_names) else len(class_type_names)
+        )
         unused_class_type_list = random_class_type_sample.copy()
         available_teachers = list(map(lambda teacher: {'teacher_instance': teacher, 'classes': 0}, teacher_list))
 
@@ -91,7 +108,9 @@ class Class(models.Model):
         def assign_class_type():
             if len(unused_class_type_list) != 0:
                 return unused_class_type_list.pop()
-            return random_class_type_sample[random.randint(0, class_types - 1)]
+            return random_class_type_sample[random.randint(
+                0, class_types - 1 if class_types <= len(class_type_names) else len(class_type_names) - 1
+            )]
 
         while len(class_list) < total_classes:
             class_instance = Class(
@@ -117,7 +136,7 @@ class Student(models.Model):
         while len(student_list) < total_students:
             student = Student(
                 db_profile=db_profile,
-                student_name='John_Doe'
+                student_name=generate_name()
             )
             student.save()
             student_list.append(student)
