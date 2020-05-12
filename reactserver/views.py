@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic.base import View
 from common.errorhandling import generate_error_page
+from common.logging import logerror
 
 
 class HybridJsonView(View):
@@ -36,7 +37,7 @@ def react_render(content, request):
         )
         rendered_payload = res.json()
     except Exception as e:
-        print('ERROR: Failed to communicate with Reactserver: ', e)
+        logerror(e, message='react_render failed to communicate with Reactserver')
         return generate_error_page(
             request,
             code='REACTSERVER_ERROR',

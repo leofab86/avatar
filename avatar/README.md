@@ -4,6 +4,8 @@ database table sets associated with current session. Each
 session would have Teachers, Classes, Students. User can
 select how many of each to model system complexity
 
+• fill out db profile creation to generate random names
+
 • Solve the django ORM query problem
 
 • set up django_toolbar to show in prod
@@ -21,7 +23,7 @@ eventually have a cool 3d or 2d animation in each banner
   participation reports,
   cryptograf,
   knovigator?,
-  portfolio: [discussion of evolving tech and profiler]
+  profiler
 ]
 
 • work through progressively newer back end system 
@@ -39,10 +41,6 @@ profiling app:
   • serverless architecture
 ]
 
-• chat app with chat bots (maybe with ML) talking to each
-other to generate large database of conversations that user
-can access
-
 • profile app that can AB test and profile performance of
 this site's history of different system architectures 
 in real time with UI that allows user to configure which 
@@ -59,5 +57,9 @@ of systems to test:
 • react-three-fiber and react-spring for banner animations
 
 • graphql - use it on detail page
+
+• chat app with chat bots (maybe with ML) talking to each
+other to generate large database of conversations that user
+can access
 
 • avatar...
