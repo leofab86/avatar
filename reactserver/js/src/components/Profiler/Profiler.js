@@ -43,7 +43,7 @@ export default function Profiler () {
 
     const deleteProfile = () => {
         deleteDatabaseProfile(selectedDbProfile).then(r => {
-            if (r === 200 || r === 404) {
+            if (r === 200) {
                 deleteDbProfileFromStore(selectedDbProfile)
             }
         })

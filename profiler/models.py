@@ -80,8 +80,6 @@ class Class(models.Model):
         unused_class_type_list = random_class_type_sample.copy()
         available_teachers = list(map(lambda teacher: {'teacher_instance': teacher, 'classes': 0}, teacher_list))
 
-        print('available_teachers', available_teachers)
-
         def assign_teacher():
             teacher_index = random.randint(0, len(available_teachers) - 1)
             teacher = available_teachers[teacher_index]

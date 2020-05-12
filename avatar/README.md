@@ -4,6 +4,10 @@ database table sets associated with current session. Each
 session would have Teachers, Classes, Students. User can
 select how many of each to model system complexity
 
+• Solve the django ORM query problem
+
+• set up django_toolbar to show in prod
+
 • see if you can create separate app that can bombard your
 ec2 server with requests to eventually use in profile app
 

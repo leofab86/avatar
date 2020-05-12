@@ -26,7 +26,7 @@ SECRET_KEY = '_=op516*)+rmgir8_*u$d0%!am8wq*3q*k9(pcwn$)0k5cz)wu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Set up a custom callback here that determines weather to show the Debug toolbar in production
+# TODO: Set up a custom callback here that determines weather to show the Debug toolbar in production
 # SHOW_TOOLBAR_CALLBACK =
 
 DEBUG_TOOLBAR_PANELS = [
@@ -52,6 +52,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'rest_framework',
+    'common.apps.CommonConfig',
     'reactserver.apps.ReactServerConfig',
     'profiler.apps.ProfilerConfig',
     'portfolio.apps.WebsiteConfig',
