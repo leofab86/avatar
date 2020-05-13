@@ -1,0 +1,31 @@
+.dataModelConfigModule {
+  padding: 10px;
+  border: solid 1px black;
+  max-width: 300px;
+}
+
+.savedConfigs {
+  margin-bottom: 20px;
+}
+.savedConfigsHeader {
+  margin-bottom: 10px;
+}
+.savedConfigsSelect {
+  width: 150px;
+  margin-right: 10px;
+}
+
+.configForm {
+  display: flex;
+  flex-direction: column;
+
+  input {
+    margin-bottom: 10px;
+  }
+}
+.configFormHeader {
+  margin-bottom: 10px;
+}
+.configFormSubmitButton {
+  width: 100px;
+}

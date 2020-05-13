@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
 import { useStore } from 'store';
-import { useHydrateStoreOnPageLoad } from 'actions';
+import { useHydrateStoreOnPageLoad } from 'actions/api';
 // import styles from './styles.scss';
 
 
