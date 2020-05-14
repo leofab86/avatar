@@ -7,9 +7,7 @@ class StudentSerializer(ModelSerializer):
         model = Student
         fields = ('student_id', 'student_name', 'classes')
 
-    def __init__(self, *args, **kwargs):
-        children = kwargs.pop('children', None)
-        full_children = kwargs.pop('full_children', None)
+    def __init__(self, *args, children=None, full_children=None, **kwargs):
         super(StudentSerializer, self).__init__(*args, **kwargs)
         if children is False:
             del self.fields['classes']
@@ -24,9 +22,7 @@ class ClassSerializer(ModelSerializer):
         model = Class
         fields = ('class_id', 'class_type', 'teacher', 'students')
 
-    def __init__(self, *args, **kwargs):
-        children = kwargs.pop('children', None)
-        full_children = kwargs.pop('full_children', None)
+    def __init__(self, *args, children=None, full_children=None, **kwargs):
         super(ClassSerializer, self).__init__(*args, **kwargs)
         if children is False:
             del self.fields['students']
@@ -54,7 +50,7 @@ class TeacherSerializer(ModelSerializer):
 class DatabaseProfileSerializer(ModelSerializer):
     class Meta:
         model = DatabaseProfile
-        fields = (
+        response_fields = (
             'db_profile_name',
             'db_profile_id',
             'teachers',
@@ -62,11 +58,17 @@ class DatabaseProfileSerializer(ModelSerializer):
             'students',
             'completion_progress'
         )
+        create_request_fields = response_fields + (
+            'class_types',
+            'classes_per_teacher',
+            'classes_per_student'
+        )
 
-    def __init__(self, *args, **kwargs):
-        children = kwargs.pop('children', None)
-        recursive_children = kwargs.pop('recursive_children', None)
-        full_recursive_children = kwargs.pop('full_recursive_children', None)
+    def __init__(self,  *args, children=None, recursive_children=None, full_recursive_children=None, **kwargs):
+        if "data" in kwargs:
+            self.Meta.fields = self.Meta.create_request_fields
+        else:
+            self.Meta.fields = self.Meta.response_fields
         super(DatabaseProfileSerializer, self).__init__(*args, **kwargs)
         if children:
             children_fields = {

@@ -1,5 +1,6 @@
 # Todo
-• Solve the django ORM query problem
+• Solve the django ORM query problem and build query
+optimization module around this
 
 • set up django_toolbar to show in prod
 

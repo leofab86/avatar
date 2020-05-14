@@ -34,12 +34,11 @@ def handle_database_exceptions(e):
     )
 
 
-def handle_request_validation_error(e, key):
+def handle_request_validation_error(e):
     if type(e) is serializers.ValidationError:
-        message = e.get_full_details()
         return generate_error_resp(
             code='VALIDATION_ERROR',
-            message={key: list(map(lambda x: x['message'], message))},
+            message=e.get_full_details(),
             status=400
         )
     logerror(e, message='handle_request_validation_error')
@@ -50,50 +49,29 @@ def handle_request_validation_error(e, key):
     )
 
 
-# TODO: Model fails to validate in certain cases (use Django Rest or views should use serializers)
 def request_validation(methods, *, expected_body=None):
     def decorator(func):
         def handler(request, *args, **kwargs):
             if request.method not in methods:
                 return HttpResponse(status=405)
 
-            decoded_body = request.body.decode(encoding='utf-8')
-
-            if decoded_body is not None and len(decoded_body) != 0:
-                try:
-                    request_body = json.loads(decoded_body)
-                except Exception as e:
-                    logerror(e, message='request_validation json.loads error')
-                    request_body = {}
-
-                if type(request_body) == str:
-                    request_body = {}
-            else:
-                request_body = {}
-
             if expected_body:
-                if decoded_body is None:
+                decoded_body = request.body.decode(encoding='utf-8')
+                try:
+                    json_body = json.loads(decoded_body)
+                except:
                     return generate_error_resp(
                         code='REQUEST_ERROR',
-                        message='request body missing',
+                        message='request body is missing or malformed',
                         status=400
                     )
+                try:
+                    serializer = expected_body(data=json_body)
+                    serializer.is_valid(raise_exception=True)
+                except Exception as e:
+                    return handle_request_validation_error(e)
+                kwargs['body'] = serializer.data
 
-                for key in expected_body:
-                    if key not in request_body:
-                        return generate_error_resp(
-                            code='VALIDATION_ERROR',
-                            message={key: f'request body expects required {key} property'},
-                            status=400
-                        )
-                    try:
-                        # expected_body should be a dict using serializer fields which have the to_internal_value method
-                        # that will raise a serializers.ValidationError if request body doesn't match serializer fields
-                        expected_body[key].to_internal_value(request_body[key])
-                    except Exception as e:
-                        return handle_request_validation_error(e, key)
-
-            kwargs['body'] = request_body
             return func(request, *args, **kwargs)
         return handler
     return decorator
