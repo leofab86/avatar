@@ -24,12 +24,12 @@ class Timing(object):
     def __init__(self, label):
         self.label = label
 
-    def get_name(self, key):
+    def _get_name(self, key):
         return f'{self.label}{f" - {key}" if key != "" else ""}'
 
     def start(self, key=''):
         if settings.DEBUG:
-            name = self.get_name(key)
+            name = self._get_name(key)
             if len(self.time_list) == 0:
                 print(' ')
                 print('**********************************************************')
@@ -43,7 +43,7 @@ class Timing(object):
 
     def end(self, key=''):
         end = time.process_time() - self.time_store[key]
-        name = self.get_name(key)
+        name = self._get_name(key)
         if settings.DEBUG:
             print(f'END: {name}')
             print(end)

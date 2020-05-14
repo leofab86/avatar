@@ -1,15 +1,30 @@
-import React from 'react';
+import React, {useState} from 'react';
 import cn from 'classnames';
 import { useStore } from 'store';
-import { createDatabaseProfile, deleteDatabaseProfile } from 'actions/api';
+import { createDatabaseProfile, deleteDatabaseProfile, checkDatabaseProgress } from 'actions/api';
 import { useUpdateSelectedProfile } from './hooks';
 import styles from './styles.scss';
 
 
 export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, setSelectedDbProfile }) {
     const {deleteDbProfileFromStore, hydrateStore} = useStore();
+    const [progress, setProgress] = useState(null);
+
 
     useUpdateSelectedProfile(dbProfiles, setSelectedDbProfile);
+
+    const checkProgress = db_profile => {
+        if(db_profile.completion_progress === 100) {
+            hydrateStore.db_profile(db_profile);
+            setProgress(null)
+        } else {
+            setProgress(db_profile.completion_progress);
+            setTimeout(() => {
+                checkDatabaseProgress(db_profile.db_profile_id)
+                    .then(({ db_profile }) => checkProgress(db_profile))
+            }, 800);
+        }
+    };
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -32,7 +47,7 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
             classes_per_student
         }).then(({ db_profile }) => {
             if(db_profile) {
-                hydrateStore.db_profile(db_profile);
+                checkProgress(db_profile)
             }
         })
     };
@@ -46,8 +61,9 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
             <h3>Data Model Config</h3>
             <p>
                 Create a set of data using a school system model. Choose the number of classes, teachers and
-                students. Depending on your configuration values, this can generate a pretty complex hierarchical data
-                structure that will affect system performance depending on how you query this data.
+                students. With high values, this can generate a pretty complex hierarchical data
+                structure that will affect system performance necessitating thoughtful optimization of your
+                queries.
             </p>
 
             <div className={styles.savedConfigs}>
@@ -89,7 +105,21 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
                 <label htmlFor="classes_per_student">Classes per Student</label>
                 <input type="number" id="classes_per_student"/>
 
-                <button className={cn('profilerButton', styles.configFormSubmitButton)} type="submit">Create</button>
+                <div className={styles.submitRow}>
+                    <button
+                        className={cn('profilerButton', styles.configFormSubmitButton)}
+                        type="submit"
+                    >
+                        Create
+                    </button>
+
+                    {progress !== null && (
+                        <div className={styles.progressBar}>
+                            <div className={styles.progressBarFill} style={{ width: `${progress <= 5 ? 5 :progress}%` }}/>
+                        </div>
+                    )}
+                </div>
+
             </form>
         </div>
     )

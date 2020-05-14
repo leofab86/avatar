@@ -1,3 +1,4 @@
+import math
 import random
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -19,7 +20,7 @@ last_names = [
 ]
 
 
-def generate_name():
+def _generate_name():
     return f'{first_names[random.randint(0, len(first_names) - 1)]} {last_names[random.randint(0, len(last_names) - 1)]}'
 
 
@@ -32,6 +33,7 @@ class DatabaseProfile(models.Model):
     classes_per_teacher = models.IntegerField()
     students = models.IntegerField()
     classes_per_student = models.IntegerField()
+    completion_progress = models.IntegerField(default=0)
 
     def __str__(self):
         return self.db_profile_name
@@ -42,24 +44,49 @@ class DatabaseProfile(models.Model):
         if self.classes_per_student > self.classes:
             raise ValidationError({'classes_per_student': 'Cannot have more classes per student than classes.'})
 
+    # TODO: save is failing to validate correctly on empty request body or body has certain incorrect properties
     def save(self, *args, **kwargs):
         self.full_clean()
         super(DatabaseProfile, self).save(*args, **kwargs)
-        teacher_list = Teacher.save_teacher_set(db_profile=self, total_teachers=self.teachers)
+
+    def save_sets(self):
+        interval_progress = 0
+        save_count = 0
+        total_saves = self.teachers + self.classes + self.students
+
+        def save_progress():
+            nonlocal self
+            nonlocal interval_progress
+            nonlocal save_count
+            save_count = save_count + 1
+            current_progress = math.floor(save_count / total_saves * 100)
+            if current_progress >= interval_progress + 5:
+                interval_progress = interval_progress + 5
+                self.completion_progress = interval_progress
+                super(DatabaseProfile, self).save()
+
+        teacher_list = Teacher.save_teacher_set(
+            db_profile=self,
+            total_teachers=self.teachers,
+            save_progress=save_progress
+        )
         class_list = Class.save_class_set(
             db_profile=self,
             total_classes=self.classes,
             teacher_list=teacher_list,
             classes_per_teacher=self.classes_per_teacher,
-            class_types=self.class_types
+            class_types=self.class_types,
+            save_progress=save_progress
         )
         Student.save_student_set(
             db_profile=self,
             total_students=self.students,
             class_list=class_list,
-            classes_per_student=self.classes_per_student
+            classes_per_student=self.classes_per_student,
+            save_progress=save_progress
         )
-        return self
+        self.completion_progress = 100
+        super(DatabaseProfile, self).save()
 
 
 class Teacher(models.Model):
@@ -68,15 +95,16 @@ class Teacher(models.Model):
     teacher_id = models.AutoField(primary_key=True)
 
     @staticmethod
-    def save_teacher_set(*, db_profile, total_teachers):
+    def save_teacher_set(*, db_profile, total_teachers, save_progress):
         teacher_list = []
         while len(teacher_list) < total_teachers:
             teacher = Teacher(
                 db_profile=db_profile,
-                teacher_name=generate_name()
+                teacher_name=_generate_name()
             )
             teacher.save()
             teacher_list.append(teacher)
+            save_progress()
 
         return teacher_list
 
@@ -88,7 +116,7 @@ class Class(models.Model):
     class_type = models.CharField(max_length=200)
 
     @staticmethod
-    def save_class_set(*, db_profile, total_classes, teacher_list, classes_per_teacher, class_types):
+    def save_class_set(*, db_profile, total_classes, teacher_list, classes_per_teacher, class_types, save_progress):
         class_list = []
         random_class_type_sample = random.sample(
             class_type_names,
@@ -120,6 +148,7 @@ class Class(models.Model):
             )
             class_instance.save()
             class_list.append(class_instance)
+            save_progress()
 
         return class_list
 
@@ -131,16 +160,17 @@ class Student(models.Model):
     student_id = models.AutoField(primary_key=True)
 
     @staticmethod
-    def save_student_set(*, db_profile, total_students, class_list, classes_per_student):
+    def save_student_set(*, db_profile, total_students, class_list, classes_per_student, save_progress):
         student_list = []
         while len(student_list) < total_students:
             student = Student(
                 db_profile=db_profile,
-                student_name=generate_name()
+                student_name=_generate_name()
             )
             student.save()
             student_list.append(student)
             class_assignment_list = random.sample(class_list, classes_per_student)
             for _class in class_assignment_list:
                 student.classes.add(_class)
+            save_progress()
 

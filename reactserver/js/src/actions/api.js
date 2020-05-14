@@ -29,12 +29,15 @@ export const createDatabaseProfile = (data) => {
 };
 
 export const deleteDatabaseProfile = db_profile_id => {
-    return fetch(window.location.origin + '/profiler/delete_database_profile', {
+    return fetch(window.location.origin + '/profiler/delete_database_profile/' + db_profile_id, {
       method: 'DELETE',
       headers: {
-          'Content-Type': 'application/json',
           'X-CSRFToken': Cookie.get('csrftoken')
       },
-      body: JSON.stringify({db_profile_id})
   }).then(r => r.status)
+};
+
+export const checkDatabaseProgress = db_profile_id => {
+    return fetch(window.location.origin + '/profiler/check_progress/' + db_profile_id)
+        .then(r => r.json())
 };

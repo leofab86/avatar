@@ -29,3 +29,19 @@
 .configFormSubmitButton {
   width: 100px;
 }
+.submitRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.progressBar {
+  margin-left: 15px;
+  width: 170px;
+  height: 10px;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+.progressBarFill {
+  height: 100%;
+  background-color: antiquewhite;
+}

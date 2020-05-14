@@ -60,6 +60,7 @@ class DatabaseProfileSerializer(ModelSerializer):
             'teachers',
             'classes',
             'students',
+            'completion_progress'
         )
 
     def __init__(self, *args, **kwargs):

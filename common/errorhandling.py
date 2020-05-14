@@ -50,17 +50,35 @@ def handle_request_validation_error(e, key):
     )
 
 
+# TODO: Model fails to validate in certain cases (use Django Rest or views should use serializers)
 def request_validation(methods, *, expected_body=None):
     def decorator(func):
         def handler(request, *args, **kwargs):
             if request.method not in methods:
                 return HttpResponse(status=405)
-            try:
-                request_body = json.loads(request.body.decode(encoding='utf-8'))
-            except Exception as e:
-                logerror(e, message='request_validation json.loads error')
+
+            decoded_body = request.body.decode(encoding='utf-8')
+
+            if decoded_body is not None and len(decoded_body) != 0:
+                try:
+                    request_body = json.loads(decoded_body)
+                except Exception as e:
+                    logerror(e, message='request_validation json.loads error')
+                    request_body = {}
+
+                if type(request_body) == str:
+                    request_body = {}
+            else:
                 request_body = {}
+
             if expected_body:
+                if decoded_body is None:
+                    return generate_error_resp(
+                        code='REQUEST_ERROR',
+                        message='request body missing',
+                        status=400
+                    )
+
                 for key in expected_body:
                     if key not in request_body:
                         return generate_error_resp(
@@ -75,7 +93,8 @@ def request_validation(methods, *, expected_body=None):
                     except Exception as e:
                         return handle_request_validation_error(e, key)
 
-            return func(request, *args, body=request_body, **kwargs)
+            kwargs['body'] = request_body
+            return func(request, *args, **kwargs)
         return handler
     return decorator
 
