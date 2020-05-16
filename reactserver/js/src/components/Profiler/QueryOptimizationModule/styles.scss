@@ -1,0 +1,35 @@
+.queryOptimizationModule {
+  max-width: 500px;
+  overflow: hidden;
+}
+.selectedDbHeader {
+  margin-bottom: 5px;
+}
+.selectedDbName {
+  margin-top: 5px;
+}
+
+.requestRow {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+.timer {
+  margin-left: 5px;
+}
+
+.reactJsonContainer {
+  margin-top: 10px;
+  position: relative;
+  padding: 5px;
+  background-color: rgb(39, 40, 34);
+  border-radius: 3px;
+}
+.reactJsonHeader {
+  margin-bottom: 5px;
+}
+.reactJsonBlocker {
+  position: absolute;
+  top: -1px; bottom: -1px; left: -1px; right: -1px;
+  cursor: pointer;
+}

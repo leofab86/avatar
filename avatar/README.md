@@ -1,8 +1,23 @@
 # Todo
+• Solve the django ORM query problem and build query
+optimization module around this
+    • Find way to display queries (at least # of queries) 
+      on getDatabaseProfile calls, or use django_toolbar in
+      prod?
+    • Pass timing data to getDatabaseProfile calls that
+      provides measurements of queries vs serialization
+
+# Roadmap
+• push develop onto prod
+
+• profiler UI improvements:
+    • animate progress bar
+    • ReactJsonView code split is creating server bundle 
+    as well. Configure to only create client bundle
+
 • see if you can create separate app that can bombard your
 ec2 server with requests to eventually use in profile app
 
-# Roadmap
 • portfolio home page is list of large, full width banners
 representing individual parts of my portfolio that will 
 eventually have a cool 3d or 2d animation in each banner
@@ -12,7 +27,7 @@ eventually have a cool 3d or 2d animation in each banner
   participation reports,
   cryptograf,
   knovigator?,
-  portfolio: [discussion of evolving tech and profiler]
+  profiler
 ]
 
 • work through progressively newer back end system 
@@ -25,13 +40,10 @@ profiling app:
   necessary and load balancer to manage them and some 
   way to artificially test load on it
   • add redis for cache 
+  • multiple replicated database instances? (ask Tony)
   • wrapping previous implementation in docker
   • serverless architecture
 ]
-
-• chat app with chat bots (maybe with ML) talking to each
-other to generate large database of conversations that user
-can access
 
 • profile app that can AB test and profile performance of
 this site's history of different system architectures 
@@ -49,5 +61,9 @@ of systems to test:
 • react-three-fiber and react-spring for banner animations
 
 • graphql - use it on detail page
+
+• chat app with chat bots (maybe with ML) talking to each
+other to generate large database of conversations that user
+can access
 
 • avatar...

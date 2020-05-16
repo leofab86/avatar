@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import { useStore } from 'store';
-import { useHydrateStoreOnPageLoad } from 'utils/customHooks.js';
+import { useHydrateStoreOnPageLoad } from 'actions/api';
 import styles from './styles.scss';
 
 
 export default function Home () {
-    const projects = useStore().get('projects');
+    const projects = useStore().getFromStore('projects');
 
     useHydrateStoreOnPageLoad(!projects);
 

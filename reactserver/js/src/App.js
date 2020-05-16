@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, StaticRouter, Switch, Route } from "react-router-dom";
 import Home from 'components/Home';
 import DetailsPage from "components/DetailsPage";
+import Profiler from "components/Profiler";
+import GlobalModal from "components/GlobalModal";
 import { StoreProvider } from 'store'
 
 
@@ -28,10 +30,11 @@ export default function App ({ store, staticRouterProps }) {
                     </Route>
 
                     <Route path='/profiler' exact>
-                        <Home />
+                        <Profiler />
                     </Route>
                 </Switch>
             )}
+            <GlobalModal />
         </StoreProvider>
     )
 }

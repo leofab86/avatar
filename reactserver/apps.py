@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class ReactserverConfig(AppConfig):
+class ReactServerConfig(AppConfig):
     name = 'reactserver'
