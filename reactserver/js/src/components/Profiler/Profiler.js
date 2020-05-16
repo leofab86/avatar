@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useStore } from 'store';
 import { useHydrateStoreOnPageLoad } from 'actions/api';
-import DataModelConfigModule from "./DataModelConfigModule";
+import DataConfigModule from "./DataConfigModule";
+import QueryOptimizationModule from "./QueryOptimizationModule";
 import styles from './styles.scss';
 
 
 export default function Profiler () {
     const {getFromStore} = useStore();
     const dbProfiles = getFromStore('db_profiles');
-    const [selectedDbProfile, setSelectedDbProfile] = useState(dbProfiles?.[0]?.db_profile_id);
+    const [selectedDbProfile, setSelectedDbProfile] = useState(dbProfiles?.[0]);
 
     useHydrateStoreOnPageLoad(!dbProfiles);
 
@@ -22,13 +23,13 @@ export default function Profiler () {
             </p>
 
             <div className={styles.profilerModuleContainer}>
-                <DataModelConfigModule
+                <DataConfigModule
                     dbProfiles={dbProfiles}
                     selectedDbProfile={selectedDbProfile}
                     setSelectedDbProfile={setSelectedDbProfile}
                 />
 
-                <div className={'profilerModule'} />
+                <QueryOptimizationModule selectedDbProfile={selectedDbProfile}/>
             </div>
         </div>
     )

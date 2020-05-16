@@ -3,8 +3,16 @@ import React, {useState, useContext} from 'react';
 
 const StoreContext = React.createContext({});
 
+const modalState = {
+    Component: null,
+};
+
 export const StoreProvider = ({ children, store }) => {
-  const [storeState, setStore] = useState(store);
+  const defaultStore = {
+      ...store,
+      modalState
+  };
+  const [storeState, setStore] = useState(defaultStore);
   return (
     <StoreContext.Provider value={{store: storeState, setStore}}>
       {children}
@@ -51,6 +59,9 @@ export const useStore = () => {
         }
         return result
     },
+
+    openModal: Component => setStore(prevState => ({...prevState, modalState: { Component }})),
+    closeModal: () => setStore(prevState => ({...prevState, modalState: { Component: null }})),
 
     hydrateStore: _generateHydrateStoreFunctions(setStore),
 

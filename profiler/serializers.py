@@ -7,12 +7,15 @@ class StudentSerializer(ModelSerializer):
         model = Student
         fields = ('student_id', 'student_name', 'classes')
 
-    def __init__(self, *args, children=None, full_children=None, **kwargs):
+    def __init__(self, *args, recursive_levels=None, **kwargs):
         super(StudentSerializer, self).__init__(*args, **kwargs)
-        if children is False:
+        if recursive_levels == 1 and 'classes' in self.fields:
             del self.fields['classes']
-        if full_children is True:
-            self.fields['classes'] = ClassSerializer(many=True, read_only=True, children=False)
+        if recursive_levels and recursive_levels > 1:
+            new_recursive_levels = recursive_levels - 1
+            self.fields['classes'] = ClassSerializer(
+                many=True, read_only=True, recursive_levels=new_recursive_levels
+            )
 
 
 class ClassSerializer(ModelSerializer):
@@ -22,12 +25,15 @@ class ClassSerializer(ModelSerializer):
         model = Class
         fields = ('class_id', 'class_type', 'teacher', 'students')
 
-    def __init__(self, *args, children=None, full_children=None, **kwargs):
+    def __init__(self, *args, recursive_levels=None, **kwargs):
         super(ClassSerializer, self).__init__(*args, **kwargs)
-        if children is False:
+        if recursive_levels == 1 and 'students' in self.fields:
             del self.fields['students']
-        if full_children is True:
-            self.fields['students'] = StudentSerializer(source='student_set', many=True, read_only=True, children=False)
+        if recursive_levels and recursive_levels > 1:
+            new_recursive_levels = recursive_levels - 1
+            self.fields['students'] = StudentSerializer(
+                source='student_set', many=True, read_only=True, recursive_levels=new_recursive_levels
+            )
 
 
 class TeacherSerializer(ModelSerializer):
@@ -37,14 +43,15 @@ class TeacherSerializer(ModelSerializer):
         model = Teacher
         fields = ('teacher_id', 'teacher_name', 'classes')
 
-    def __init__(self, *args, **kwargs):
-        children = kwargs.pop('children', None)
-        full_children = kwargs.pop('full_children', None)
+    def __init__(self, *args, recursive_levels=None, **kwargs):
         super(TeacherSerializer, self).__init__(*args, **kwargs)
-        if children is False:
+        if recursive_levels == 1 and 'classes' in self.fields:
             del self.fields['classes']
-        if full_children is True:
-            self.fields['classes'] = ClassSerializer(many=True, read_only=True, children=False)
+        if recursive_levels and recursive_levels > 1:
+            new_recursive_levels = recursive_levels - 1
+            self.fields['classes'] = ClassSerializer(
+                many=True, read_only=True, recursive_levels=new_recursive_levels
+            )
 
 
 class DatabaseProfileSerializer(ModelSerializer):
@@ -56,7 +63,7 @@ class DatabaseProfileSerializer(ModelSerializer):
             'teachers',
             'classes',
             'students',
-            'completion_progress'
+            'completion_progress',
         )
         create_request_fields = response_fields + (
             'class_types',
@@ -64,33 +71,18 @@ class DatabaseProfileSerializer(ModelSerializer):
             'classes_per_student'
         )
 
-    def __init__(self,  *args, children=None, recursive_children=None, full_recursive_children=None, **kwargs):
+    def __init__(self, *args, teacher_levels=None, class_levels=None, student_levels=None, **kwargs):
         if "data" in kwargs:
             self.Meta.fields = self.Meta.create_request_fields
         else:
             self.Meta.fields = self.Meta.response_fields
+
         super(DatabaseProfileSerializer, self).__init__(*args, **kwargs)
-        if children:
-            children_fields = {
-                'classes': ClassSerializer(source='class_set', many=True, read_only=True, children=False),
-                'teachers': TeacherSerializer(source='teacher_set', many=True, read_only=True, children=False),
-                'students': StudentSerializer(source='student_set', many=True, read_only=True, children=False)
-            }
-            for child in children:
-                self.fields[f'{child}_set'] = children_fields[child]
-        if recursive_children:
-            recursive_children_fields = {
-                'classes': ClassSerializer(source='class_set', many=True, read_only=True, children=True),
-                'teachers': TeacherSerializer(source='teacher_set', many=True, read_only=True, children=True),
-                'students': StudentSerializer(source='student_set', many=True, read_only=True, children=True)
-            }
-            for child in recursive_children:
-                self.fields[f'{child}_set'] = recursive_children_fields[child]
-        if full_recursive_children:
-            full_recursive_children_fields = {
-                'classes': ClassSerializer(source='class_set', many=True, read_only=True, full_children=True),
-                'teachers': TeacherSerializer(source='teacher_set', many=True, read_only=True, full_children=True),
-                'students': StudentSerializer(source='student_set', many=True, read_only=True, full_children=True)
-            }
-            for child in full_recursive_children:
-                self.fields[f'{child}_set'] = full_recursive_children_fields[child]
+
+        if teacher_levels:
+            self.fields['teacher_set'] = TeacherSerializer(many=True, read_only=True, recursive_levels=teacher_levels)
+        if class_levels:
+            self.fields['class_set'] = ClassSerializer(many=True, read_only=True, recursive_levels=class_levels)
+        if student_levels:
+            self.fields['student_set'] = StudentSerializer(many=True, read_only=True, recursive_levels=student_levels)
+

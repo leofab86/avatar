@@ -1,13 +1,23 @@
 # Todo
 • Solve the django ORM query problem and build query
 optimization module around this
+    • Find way to display queries (at least # of queries) 
+      on getDatabaseProfile calls, or use django_toolbar in
+      prod?
+    • Pass timing data to getDatabaseProfile calls that
+      provides measurements of queries vs serialization
 
-• set up django_toolbar to show in prod
+# Roadmap
+• push develop onto prod
+
+• profiler UI improvements:
+    • animate progress bar
+    • ReactJsonView code split is creating server bundle 
+    as well. Configure to only create client bundle
 
 • see if you can create separate app that can bombard your
 ec2 server with requests to eventually use in profile app
 
-# Roadmap
 • portfolio home page is list of large, full width banners
 representing individual parts of my portfolio that will 
 eventually have a cool 3d or 2d animation in each banner

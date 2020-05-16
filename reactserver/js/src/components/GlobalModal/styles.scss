@@ -1,0 +1,17 @@
+.globalModalOverlay {
+  position: fixed;
+  top: 0; bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #00000045;
+}
+.globalModal {
+  padding: 10px;
+  border-radius: 3px;
+  background-color: rgb(39, 40, 34);
+  min-width: 420px;
+  min-height: 219px;
+  max-height: 70%;
+  overflow: scroll;
+}

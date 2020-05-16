@@ -2,11 +2,12 @@ import React, {useState} from 'react';
 import cn from 'classnames';
 import { useStore } from 'store';
 import { createDatabaseProfile, deleteDatabaseProfile, checkDatabaseProgress } from 'actions/api';
+import ProgressBar from "../ProgressBar";
 import { useUpdateSelectedProfile } from './hooks';
 import styles from './styles.scss';
 
 
-export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, setSelectedDbProfile }) {
+export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSelectedDbProfile }) {
     const {deleteDbProfileFromStore, hydrateStore} = useStore();
     const [progress, setProgress] = useState(null);
 
@@ -53,8 +54,8 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
     };
 
     const deleteProfile = () =>
-        deleteDatabaseProfile(selectedDbProfile)
-            .then(status => status === 200 && deleteDbProfileFromStore(selectedDbProfile));
+        deleteDatabaseProfile(selectedDbProfile.db_profile_id)
+            .then(status => status === 200 && deleteDbProfileFromStore(selectedDbProfile.db_profile_id));
 
     return (
         <div className={cn('profilerModule', styles.dataModelConfigModule)}>
@@ -70,11 +71,11 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
                 <h4 className={styles.savedConfigsHeader}>Select from existing configs:</h4>
                 <select
                     className={styles.savedConfigsSelect}
-                    value={selectedDbProfile}
-                    onChange={e => setSelectedDbProfile(e.target.value)}
+                    value={JSON.stringify(selectedDbProfile)}
+                    onChange={e => setSelectedDbProfile(JSON.parse(e.target.value))}
                 >
                   {dbProfiles?.map(dbProfile =>
-                      <option value={dbProfile.db_profile_id} key={dbProfile.db_profile_id}>
+                      <option value={JSON.stringify(dbProfile)} key={dbProfile.db_profile_id}>
                           {dbProfile.db_profile_name}
                       </option>
                   )}
@@ -113,11 +114,7 @@ export default function DataModelConfigModule ({ dbProfiles, selectedDbProfile, 
                         Create
                     </button>
 
-                    {progress !== null && (
-                        <div className={styles.progressBar}>
-                            <div className={styles.progressBarFill} style={{ width: `${progress <= 5 ? 5 :progress}%` }}/>
-                        </div>
-                    )}
+                    {progress !== null && <ProgressBar progress={progress}/>}
                 </div>
 
             </form>

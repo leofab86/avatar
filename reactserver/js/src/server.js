@@ -15,7 +15,7 @@ const server = http.Server(app)
 
 // I've increased the limit of the max payload size in case a huge page
 // needs to be rendered
-app.use(bodyParser.json({ limit: '10mb' }))
+app.use(bodyParser.json({ limit: '100mb' }))
 
 developmentMode && (
   app.use(function logger (req, res, next) {
