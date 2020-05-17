@@ -7,6 +7,7 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
     const [classLevels, setClassLevels] = useState(0);
     const [studentLevels, setStudentLevels] = useState(0);
     const [prefetchRelated, setPrefetchRelated] = useState(false);
+    const [customOptimization, setCustomOptimization] = useState(false);
 
     useEffect(function setQueryConfig_onConfigChange () {
         setQueryConfig(prevState => ({
@@ -14,9 +15,10 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
             teacherLevels,
             classLevels,
             studentLevels,
-            prefetchRelated
+            prefetchRelated,
+            customOptimization
         }))
-    }, [teacherLevels, classLevels, studentLevels, prefetchRelated]);
+    }, [teacherLevels, classLevels, studentLevels, prefetchRelated, customOptimization]);
 
     return (
         <div className={styles.childDepthSection}>
@@ -68,14 +70,33 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
                 below (this is an ORM configuration that reduces queries by getting related data all at once).
             </p>
 
-            <label className={styles.prefetchRelatedLabel} htmlFor='prefetch_related_radio'>Prefetch Related:</label>
-            <input
-                checked={prefetchRelated}
-                onChange={() => setPrefetchRelated(!prefetchRelated)}
-                className={styles.prefetchRelatedCheckBox}
-                type='checkbox'
-                id='prefetch_related_radio'
-            />
+            <div className={styles.checkboxContainer}>
+                <input
+                    checked={prefetchRelated}
+                    onChange={() => {setPrefetchRelated(!prefetchRelated); setCustomOptimization(false)}}
+                    className={styles.optimizationCheckBox}
+                    type='checkbox'
+                    id='prefetch_related_checkbox'
+                />
+                <label className={styles.optimizationLabel} htmlFor='prefetch_related_checkbox'>
+                    Prefetch Related
+                </label>
+            </div>
+
+            <div className={styles.checkboxContainer}>
+                <input
+                    checked={customOptimization}
+                    onChange={() => {setCustomOptimization(!customOptimization); setPrefetchRelated(false)}}
+                    className={styles.optimizationCheckBox}
+                    type='checkbox'
+                    id='custom_optimization_checkbox'
+                />
+                <label className={styles.optimizationLabel} htmlFor='custom_optimization_checkbox'>
+                    Custom Optimization
+                </label>
+            </div>
+
+
         </div>
     )
 }

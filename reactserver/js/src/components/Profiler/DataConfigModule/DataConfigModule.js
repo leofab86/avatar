@@ -81,6 +81,13 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
                   )}
                 </select>
                 <button className={'profilerButton'} type='button' onClick={deleteProfile}>Delete Profile</button>
+                <span className={styles.modelNumbers}>
+                    {
+                         `( teachers: ${selectedDbProfile.teachers
+                             }, classes: ${selectedDbProfile.classes
+                             }, students: ${selectedDbProfile.students} )`
+                    }
+                </span>
             </div>
 
             <h4 className={styles.configFormHeader}>Create new config:</h4>

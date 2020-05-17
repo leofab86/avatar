@@ -5,7 +5,7 @@ import styles from './styles.scss';
 export default function LoadingTimer ({ timerActive, hideWhenZero, resetDependencies }) {
     const {time, setIsActive, reset} = useTimer();
 
-    useEffect(() => {
+    useEffect(function toggleTimer () {
         if(timerActive) reset();
         setIsActive(timerActive)
     }, [timerActive]);
