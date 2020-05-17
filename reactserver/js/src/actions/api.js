@@ -33,7 +33,13 @@ export const checkDatabaseProgress = db_profile_id => {
         .then(r => r.json())
 };
 
-export const getDatabaseProfile = (db_profile_id, { teacherLevels, classLevels, studentLevels, prefetchRelated }) => {
+export const getDatabaseProfile = (db_profile_id, {
+    teacherLevels,
+    classLevels,
+    studentLevels,
+    prefetchRelated,
+    customOptimization
+}) => {
     let queryParams = '?';
     if(teacherLevels) {
         queryParams = queryParams + 'teacher_levels=' + teacherLevels + '&'
@@ -45,7 +51,10 @@ export const getDatabaseProfile = (db_profile_id, { teacherLevels, classLevels, 
         queryParams = queryParams + 'student_levels=' + studentLevels + '&'
     }
     if(prefetchRelated) {
-        queryParams = queryParams + 'prefetch_related=' + prefetchRelated + '&'
+        queryParams = queryParams + 'prefetch_related=true&'
+    }
+    if(customOptimization) {
+        queryParams = queryParams + 'custom_optimization=true&'
     }
     return fetch(window.location.origin + '/profiler/database_profile/' + db_profile_id + queryParams, {
       method: 'GET',

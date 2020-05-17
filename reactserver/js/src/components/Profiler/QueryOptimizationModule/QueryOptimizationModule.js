@@ -46,6 +46,13 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
 
                     <h3 className={styles.selectedDbHeader}>Selected Database Model:</h3>
                     <h3 className={styles.selectedDbName}>== {selectedDbProfile.db_profile_name} ==</h3>
+                    <span>
+                        {
+                            `( teachers: ${selectedDbProfile.teachers
+                                }, classes: ${selectedDbProfile.classes
+                                }, students: ${selectedDbProfile.students} )`
+                        }
+                    </span>
 
                     <ChildDepthSection setQueryConfig={setQueryConfig}/>
 

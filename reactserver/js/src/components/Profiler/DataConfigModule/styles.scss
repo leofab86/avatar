@@ -13,6 +13,10 @@
   width: 150px;
   margin-right: 10px;
 }
+.modelNumbers {
+  display: block;
+  margin-top: 5px;
+}
 
 .configForm {
   display: flex;
@@ -32,15 +36,4 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-.progressBar {
-  margin-left: 15px;
-  width: 170px;
-  height: 10px;
-  border: 1px solid black;
-  border-radius: 2px;
-}
-.progressBarFill {
-  height: 100%;
-  background-color: antiquewhite;
 }
