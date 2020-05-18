@@ -40,6 +40,7 @@ class Timing(object):
                 print(' ')
         self.time_list.append(key)
         self.time_store[key] = time.process_time()
+        return self.time_store[key]
 
     def end(self, key=''):
         end = time.process_time() - self.time_store[key]
