@@ -1,4 +1,5 @@
 import asyncio
+import json
 from django.http import JsonResponse, HttpResponse
 from profiler.models import DatabaseProfile
 from profiler.serializers import DatabaseProfileSerializer
@@ -63,6 +64,9 @@ def check_progress(request, db_profile_id):
 
 @request_validation(['GET', 'DELETE'])
 def database_profile(request, db_profile_id):
+    timing = Timing('database_profile')
+    timing.start('full_api')
+    timing_data = {}
     if request.method == 'DELETE':
         try:
             db_profile = DatabaseProfile.objects.get(db_profile_id=db_profile_id)
@@ -79,8 +83,16 @@ def database_profile(request, db_profile_id):
         custom_optimization = request.GET.get('custom_optimization')
 
         if custom_optimization:
-            db_profile = custom_data_optimization(db_profile_id, teacher_levels, class_levels, student_levels)
-            return JsonResponse({'db_profile': [db_profile]})
+            db_profile, custom_optimization_timing_data = custom_data_optimization(
+                db_profile_id, teacher_levels, class_levels, student_levels
+            )
+            timing.start('generate_json_response')
+            response = JsonResponse({'db_profile': [db_profile]})
+            timing_data['generate_json_response'] = timing.end('generate_json_response')
+            timing_data['full_api'] = timing.end('full_api')
+            timing_data.update(custom_optimization_timing_data)
+            response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(timing_data) + '}')
+            return response
 
         prefetch_related_args = ()
         if prefetch_related == "true":

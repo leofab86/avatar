@@ -1,10 +1,17 @@
 from profiler.models import DatabaseProfile, Teacher, Student, Class
 from profiler.serializers import DatabaseProfileSerializer, TeacherSerializer, ClassSerializer, StudentSerializer
+from common.logging import Timing
 
 
 def custom_data_optimization(db_profile_id, teacher_levels, class_levels, student_levels):
+    timing = Timing('custom_data_optimization')
+    timing_data = {}
+    timing.start('db_profile_orm')
     db_profile = DatabaseProfile.objects.get(db_profile_id=db_profile_id)
+    timing_data['db_profile_orm'] = timing.end('db_profile_orm')
+    timing.start('db_profile_serializer')
     db_profile = DatabaseProfileSerializer(db_profile).data
+    timing_data['db_profile_serializer'] = timing.end('db_profile_serializer')
     teachers = []
     classes = []
     students = []
@@ -18,22 +25,35 @@ def custom_data_optimization(db_profile_id, teacher_levels, class_levels, studen
         include_students = include_classes and (teacher_levels > 2 or class_levels > 1 or student_levels > 0)
         prefetch_command = 'classes' if include_classes else None
         prefetch_command = 'classes__student_set' if include_students else prefetch_command
+        timing.start('teachers_orm')
         teachers = Teacher.objects.filter(db_profile_id=db_profile_id).prefetch_related(prefetch_command)
+        timing.end('teachers_orm')
         recursive_levels = 2 if include_classes else 1
         recursive_levels = 3 if include_students else recursive_levels
+        timing.start('teachers_serializer')
         teachers = TeacherSerializer(teachers, many=True, recursive_levels=recursive_levels).data
+        timing_data['teachers_serializer'] = timing.end('teachers_serializer')
 
     if class_levels > 0 and not include_classes:
         include_students = class_levels > 1 or student_levels > 0
         prefetch_command = 'student_set' if include_students else None
+        timing.start('classes_orm')
         classes = Class.objects.filter(db_profile_id=db_profile_id).prefetch_related(prefetch_command)
+        timing.end('classes_orm')
         recursive_levels = 2 if include_students else 1
+        timing.start('classes_serializer')
         classes = ClassSerializer(classes, many=True, recursive_levels=recursive_levels).data
+        timing.end('classes_serializer')
 
     if student_levels > 0 and not include_students:
+        timing.start('students_orm')
         students = Student.objects.filter(db_profile_id=db_profile_id)
+        timing.end('students_orm')
+        timing.start('students_serializer')
         students = StudentSerializer(students, many=True, recursive_levels=1).data
+        timing.end('students_serializer')
 
+    timing.start('custom_optimization_iteration')
     if include_classes:
         for teacher in teachers:
             this_teacher_classes = teacher['classes']
@@ -97,6 +117,7 @@ def custom_data_optimization(db_profile_id, teacher_levels, class_levels, studen
 
     if student_levels == 3 and class_levels != 3:
         print('do something')
+    timing_data['custom_optimization_iteration'] = timing.end('custom_optimization_iteration')
 
     if teacher_levels > 0:
         db_profile['teacher_set'] = teachers
@@ -105,4 +126,4 @@ def custom_data_optimization(db_profile_id, teacher_levels, class_levels, studen
     if student_levels > 0:
         db_profile['student_set'] = students
 
-    return db_profile
+    return db_profile, timing_data
