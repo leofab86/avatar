@@ -27,7 +27,7 @@ def custom_data_optimization(db_profile_id, teacher_levels, class_levels, studen
         prefetch_command = 'classes__student_set' if include_students else prefetch_command
         timing.start('teachers_orm')
         teachers = Teacher.objects.filter(db_profile_id=db_profile_id).prefetch_related(prefetch_command)
-        timing.end('teachers_orm')
+        timing_data['teachers_orm'] = timing.end('teachers_orm')
         recursive_levels = 2 if include_classes else 1
         recursive_levels = 3 if include_students else recursive_levels
         timing.start('teachers_serializer')
