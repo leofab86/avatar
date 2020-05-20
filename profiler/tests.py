@@ -44,7 +44,6 @@ class DatabaseProfileTest(TestCase):
                     self.assertDictEqual(response1, response2)
                 except Exception as e:
                     warnings.append(e)
-                    print('WARNING')
             else:
                 self.assertDictEqual(response1, response2)
 
@@ -113,6 +112,8 @@ class DatabaseProfileTest(TestCase):
         test_levels(3, 3, 2)
         test_levels(3, 3, 3)
 
-        if len(warnings) > 0 and show_warning is not None:
-            print(warnings[show_warning])
+        if len(warnings) > 0:
+            print('THERE WERE WARNINGS')
+            if show_warning is not None:
+                print(warnings[show_warning])
 
