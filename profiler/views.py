@@ -86,11 +86,11 @@ def database_profile(request, db_profile_id):
             db_profile, custom_optimization_timing_data = custom_data_optimization(
                 db_profile_id, teacher_levels, class_levels, student_levels
             )
-            timing.start('generate_json_response')
+            timing.start('generate_json')
             response = JsonResponse({'db_profile': [db_profile]})
-            timing_data['generate_json_response'] = timing.end('generate_json_response')
+            timing_data['generate_json'] = timing.end('generate_json')
             timing_data['full_api'] = timing.end('full_api')
-            timing_data.update(custom_optimization_timing_data)
+            timing_data['custom_optimization'] = custom_optimization_timing_data
             response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(timing_data) + '}')
             return response
 
@@ -112,6 +112,10 @@ def database_profile(request, db_profile_id):
             if student_levels > 0:
                 prefetch_related_args = prefetch_related_args + (prefetch_commands['student'](student_levels),)
 
+        if prefetch_related:
+            timing_data['prefetch_related'] = {}
+        timing_details = timing_data['prefetch_related'] if prefetch_related else timing_data
+
         try:
             db_profile = DatabaseProfile.objects\
                 .filter(db_profile_id=db_profile_id)\
@@ -119,13 +123,20 @@ def database_profile(request, db_profile_id):
         except DatabaseProfile.DoesNotExist:
             return HttpResponse(status=404)
 
+        timing.start('db_profile_query_and_serialize')
         serializer = DatabaseProfileSerializer(
             db_profile,
             many=True,
             student_levels=student_levels,
             class_levels=class_levels,
             teacher_levels=teacher_levels
-        )
+        ).data
+        timing_details['db_profile_query_and_serialize'] = timing.end('db_profile_query_and_serialize')
 
-        return JsonResponse({'db_profile': serializer.data})
+        timing.start('generate_json')
+        response = JsonResponse({'db_profile': serializer})
+        timing_details['generate_json'] = timing.end('generate_json')
+        timing_data['full_api'] = timing.end('full_api')
+        response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(timing_data) + '}')
+        return response
 

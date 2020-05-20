@@ -27,6 +27,9 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
         getDatabaseProfile(selectedDbProfile.db_profile_id, queryConfig)
             .then(json => {
                 if (timeStamp === requestId) {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log(json);
+                    }
                     setTimerActive(false);
                     setJson(json.db_profile[0])
                 }

@@ -1,22 +1,21 @@
 # Todo
-• Solve the django ORM query problem and build query
-optimization module around this
-    • Find way to display queries (at least # of queries) 
-      on getDatabaseProfile calls, or use django_toolbar in
-      prod?
-    • Pass timing data to getDatabaseProfile calls that
-      provides measurements of queries vs serialization
+• Learn about sql indexes and django middleware
+
+• see if you can create separate app that can bombard your
+ec2 server with requests to eventually use in profile app
+
+• learn / setup caching
 
 # Roadmap
-• push develop onto prod
-
 • profiler UI improvements:
     • animate progress bar
     • ReactJsonView code split is creating server bundle 
     as well. Configure to only create client bundle
+    
+• Move db off same machine as server, use AWS service to host
+db on cloud
 
-• see if you can create separate app that can bombard your
-ec2 server with requests to eventually use in profile app
+• Move reactserver to separate microservice
 
 • portfolio home page is list of large, full width banners
 representing individual parts of my portfolio that will 
@@ -40,7 +39,6 @@ profiling app:
   necessary and load balancer to manage them and some 
   way to artificially test load on it
   • add redis for cache 
-  • multiple replicated database instances? (ask Tony)
   • wrapping previous implementation in docker
   • serverless architecture
 ]
