@@ -17,6 +17,10 @@ class ProfilerRouter:
         # if obj1._meta.app_label == 'profiler' and obj2._meta.app_label == 'profiler':
         #     return True
 
+        """This allows test database creation."""
+        if obj1._meta.app_label == 'contenttypes' and obj2._meta.app_label == 'auth':
+            return True
+
         # return None should default correctly to only allowing relations between models associated with same database
         # allowing relations may be helpful for cases of replica databases
         return None

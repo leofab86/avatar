@@ -94,6 +94,29 @@ class Teacher(models.Model):
     teacher_name = models.CharField(max_length=200)
     teacher_id = models.AutoField(primary_key=True)
 
+    def serialize(self, *, recursive_levels=1):
+        teacher = {
+            'teacher_id': self.teacher_id,
+            'teacher_name': self.teacher_name
+        }
+        if recursive_levels > 1:
+            teacher['classes'] = []
+            for c in self.classes.all():
+                new_class = {
+                    'class_id': c.class_id,
+                    'class_type': c.class_type,
+                    'teacher': self.teacher_id
+                }
+                if recursive_levels > 2:
+                    new_class['students'] = []
+                    for s in c.student_set.all():
+                        new_class['students'].append({
+                            'student_id': s.student_id,
+                            'student_name': s.student_name
+                        })
+                teacher['classes'].append(new_class)
+        return teacher
+
     @staticmethod
     def save_teacher_set(*, db_profile, total_teachers, save_progress):
         teacher_list = []
@@ -114,6 +137,30 @@ class Class(models.Model):
     teacher = models.ForeignKey(Teacher, related_name='classes', blank=True, null=True, on_delete=models.SET_NULL)
     class_id = models.AutoField(primary_key=True)
     class_type = models.CharField(max_length=200)
+
+    def serialize(self, *, recursive_levels=1):
+        _class = {
+            'class_id': self.class_id,
+            'class_type': self.class_type,
+            'teacher': self.teacher_id,
+        }
+        if recursive_levels > 1:
+            _class['students'] = []
+            for s in self.student_set.all():
+                student = {
+                    'student_id': s.student_id,
+                    'student_name': s.student_name
+                }
+                if recursive_levels > 2:
+                    student['classes'] = []
+                    for c in s.classes.all():
+                        student['classes'].append({
+                            'class_id': c.class_id,
+                            'class_type': c.class_type,
+                            'teacher': c.teacher_id
+                        })
+                _class['students'].append(student)
+        return _class
 
     @staticmethod
     def save_class_set(*, db_profile, total_classes, teacher_list, classes_per_teacher, class_types, save_progress):
@@ -158,6 +205,29 @@ class Student(models.Model):
     classes = models.ManyToManyField(Class)
     student_name = models.CharField(max_length=200)
     student_id = models.AutoField(primary_key=True)
+
+    def serialize(self, *, recursive_levels=1):
+        student = {
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+        }
+        if recursive_levels > 1:
+            student['classes'] = []
+            for c in self.classes.all():
+                _class = {
+                    'class_id': c.class_id,
+                    'class_type': c.class_type,
+                    'teacher': c.teacher_id
+                }
+                # if recursive_levels > 2:
+                #     _class['students'] = []
+                #     for s in c.student_set.all():
+                #         _class['students'].append({
+                #             'student_id': s.student_id,
+                #             'student_name': s.student_name,
+                #         })
+                student['classes'].append(_class)
+        return student
 
     @staticmethod
     def save_student_set(*, db_profile, total_students, class_list, classes_per_student, save_progress):
