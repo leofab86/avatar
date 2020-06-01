@@ -47,73 +47,24 @@ class DatabaseProfileTest(TestCase):
             else:
                 self.assertDictEqual(response1, response2)
 
-        test_levels(0, 0, 0)
-        test_levels(0, 0, 1)
-        test_levels(0, 0, 2)
-        test_levels(0, 0, 3)
-        test_levels(0, 1, 0)
-        test_levels(0, 1, 1)
-        test_levels(0, 1, 2)
-        test_levels(0, 1, 3)
-        test_levels(0, 2, 0)
-        test_levels(0, 2, 1)
-        test_levels(0, 2, 2)
-        test_levels(0, 2, 3)
-        test_levels(0, 3, 0)
-        test_levels(0, 3, 1)
-        test_levels(0, 3, 2)
-        test_levels(0, 3, 3)
-        test_levels(1, 0, 0)
-        test_levels(1, 0, 1)
-        test_levels(1, 0, 2)
-        test_levels(1, 0, 3)
-        test_levels(1, 1, 0)
-        test_levels(1, 1, 1)
-        test_levels(1, 1, 2)
-        test_levels(1, 1, 3)
-        test_levels(1, 2, 0)
-        test_levels(1, 2, 1)
-        test_levels(1, 2, 2)
-        test_levels(1, 2, 3)
-        test_levels(1, 3, 0)
-        test_levels(1, 3, 1)
-        test_levels(1, 3, 2)
-        test_levels(1, 3, 3)
-        test_levels(2, 0, 0)
-        test_levels(2, 0, 1)
-        test_levels(2, 0, 2)
-        test_levels(2, 0, 3)
-        test_levels(2, 1, 0)
-        test_levels(2, 1, 1)
-        test_levels(2, 1, 2)
-        test_levels(2, 1, 3)
-        test_levels(2, 2, 0)
-        test_levels(2, 2, 1)
-        test_levels(2, 2, 2)
-        test_levels(2, 2, 3)
-        test_levels(2, 3, 0)
-        test_levels(2, 3, 1)
-        test_levels(2, 3, 2)
-        test_levels(2, 3, 3)
-        test_levels(3, 0, 0)
-        test_levels(3, 0, 1)
-        test_levels(3, 0, 2)
-        test_levels(3, 0, 3)
-        test_levels(3, 1, 0)
-        test_levels(3, 1, 1)
-        test_levels(3, 1, 2)
-        test_levels(3, 1, 3)
-        test_levels(3, 2, 0)
-        test_levels(3, 2, 1)
-        test_levels(3, 2, 2)
-        test_levels(3, 2, 3)
-        test_levels(3, 3, 0)
-        test_levels(3, 3, 1)
-        test_levels(3, 3, 2)
-        test_levels(3, 3, 3)
+        def test_all_levels():
+            level_1 = 0
+            level_2 = 0
+            level_3 = 0
+            while level_1 <= 3:
+                while level_2 <= 3:
+                    while level_3 <= 3:
+                        test_levels(level_1, level_2, level_3)
+                        level_3 = level_3 + 1
+                    level_2 = level_2 + 1
+                    level_3 = 0
+                level_1 = level_1 + 1
+                level_2 = 0
+
+        test_all_levels()
 
         if len(warnings) > 0:
-            print('THERE WERE WARNINGS')
+            print(f'THERE WERE {len(warnings)} WARNINGS')
             if show_warning is not None:
                 print(warnings[show_warning])
 
