@@ -1,13 +1,17 @@
 # Todo
-• Learn about sql indexes and django middleware
+• set up good DNS website name for the EC2 instance
 
 • see if you can create separate app that can bombard your
-ec2 server with requests to eventually use in profile app
+ec2 server with requests to eventually use in profile app.
+Test it on avatar. Learn about getting access to (real-time?)
+data about AWS EC2 load/performance
 
 • learn / setup caching
 
 # Roadmap
 • profiler UI improvements:
+    • fix request timer to run based on start time
+    • add learn more modal to custom optimization
     • animate progress bar
     • ReactJsonView code split is creating server bundle 
     as well. Configure to only create client bundle

@@ -1,5 +1,5 @@
 from profiler.models import DatabaseProfile, Teacher, Student, Class
-from profiler.serializers import DatabaseProfileSerializer, TeacherSerializer, ClassSerializer, StudentSerializer
+from profiler.serializers import DatabaseProfileSerializer
 from common.logging import Timing
 
 

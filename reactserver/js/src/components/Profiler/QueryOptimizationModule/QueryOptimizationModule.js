@@ -50,7 +50,7 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
                     <h3 className={styles.selectedDbHeader}>Selected Database Model:</h3>
                     <h3 className={styles.selectedDbName}>== {selectedDbProfile.db_profile_name} ==</h3>
                     <span>
-                        {
+                        {selectedDbProfile &&
                             `( teachers: ${selectedDbProfile.teachers
                                 }, classes: ${selectedDbProfile.classes
                                 }, students: ${selectedDbProfile.students} )`
@@ -68,7 +68,6 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
                             resetDependencies={[selectedDbProfile, queryConfig]}
                         />
                     </div>
-
 
                     {dbProfileJson && <ReactJsonModal dbProfileJson={dbProfileJson}/>}
                 </Fragment>

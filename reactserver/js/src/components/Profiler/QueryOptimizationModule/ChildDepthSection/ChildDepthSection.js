@@ -12,11 +12,11 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
     useEffect(function setQueryConfig_onConfigChange () {
         setQueryConfig(prevState => ({
             ...prevState,
-            teacherLevels,
-            classLevels,
-            studentLevels,
-            prefetchRelated,
-            customOptimization
+            'teacher_levels': teacherLevels,
+            'class_levels': classLevels,
+            'student_levels': studentLevels,
+            'prefetch_related': prefetchRelated,
+            'custom_optimization': customOptimization
         }))
     }, [teacherLevels, classLevels, studentLevels, prefetchRelated, customOptimization]);
 

@@ -1,5 +1,4 @@
 import asyncio
-import json
 from django.http import JsonResponse, HttpResponse
 from profiler.models import DatabaseProfile
 from profiler.serializers import DatabaseProfileSerializer
@@ -66,7 +65,6 @@ def check_progress(request, db_profile_id):
 def database_profile(request, db_profile_id):
     timing = Timing('database_profile')
     timing.start('full_api')
-    timing_data = {}
     if request.method == 'DELETE':
         try:
             db_profile = DatabaseProfile.objects.get(db_profile_id=db_profile_id)
@@ -88,10 +86,10 @@ def database_profile(request, db_profile_id):
             )
             timing.start('generate_json')
             response = JsonResponse({'db_profile': [db_profile]})
-            timing_data['generate_json'] = timing.end('generate_json')
-            timing_data['full_api'] = timing.end('full_api')
-            timing_data['custom_optimization'] = custom_optimization_timing_data
-            response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(timing_data) + '}')
+            timing.end('generate_json')
+            timing.end('full_api')
+            timing.data['custom_optimization'] = custom_optimization_timing_data
+            timing.add_data_to_response(response)
             return response
 
         prefetch_related_args = ()
@@ -112,10 +110,6 @@ def database_profile(request, db_profile_id):
             if student_levels > 0:
                 prefetch_related_args = prefetch_related_args + (prefetch_commands['student'](student_levels),)
 
-        if prefetch_related:
-            timing_data['prefetch_related'] = {}
-        timing_details = timing_data['prefetch_related'] if prefetch_related else timing_data
-
         try:
             db_profile = DatabaseProfile.objects\
                 .filter(db_profile_id=db_profile_id)\
@@ -131,12 +125,13 @@ def database_profile(request, db_profile_id):
             class_levels=class_levels,
             teacher_levels=teacher_levels
         ).data
-        timing_details['db_profile_query_and_serialize'] = timing.end('db_profile_query_and_serialize')
+        timing_data_context = 'prefetch_related' if prefetch_related else None
+        timing.end('db_profile_query_and_serialize', timing_data_context)
 
         timing.start('generate_json')
         response = JsonResponse({'db_profile': serializer})
-        timing_details['generate_json'] = timing.end('generate_json')
-        timing_data['full_api'] = timing.end('full_api')
-        response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(timing_data) + '}')
+        timing.end('generate_json')
+        timing.end('full_api')
+        timing.add_data_to_response(response)
         return response
 

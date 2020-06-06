@@ -219,13 +219,6 @@ class Student(models.Model):
                     'class_type': c.class_type,
                     'teacher': c.teacher_id
                 }
-                # if recursive_levels > 2:
-                #     _class['students'] = []
-                #     for s in c.student_set.all():
-                #         _class['students'].append({
-                #             'student_id': s.student_id,
-                #             'student_name': s.student_name,
-                #         })
                 student['classes'].append(_class)
         return student
 
@@ -243,4 +236,3 @@ class Student(models.Model):
             for _class in class_assignment_list:
                 student.classes.add(_class)
             save_progress()
-
