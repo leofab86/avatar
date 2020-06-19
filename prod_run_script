@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source /home/bitnami/.bashrc
+source /opt/bitnami/python/.virtualenvs/avatar/bin/activate
+
+cd /home/bitnami/apps/django/django_projects/avatar
+
+python3 manage.py runreactserver
