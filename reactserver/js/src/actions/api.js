@@ -62,3 +62,22 @@ export const deleteDatabaseProfile = db_profile_id => {
       },
   }).then(r => r.status)
 };
+
+export const loadTestStart = () => {
+    const testId = Date.now();
+    return fetch(window.location.origin + '/profiler/load_test_start/' + testId, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};
+
+export const loadTestCheck = (testId) => {
+    return fetch(window.location.origin + '/profiler/load_test_check/' + testId, {
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};

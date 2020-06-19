@@ -2,6 +2,7 @@ import traceback
 import time
 import json
 from django.conf import settings
+from django.db import connections
 
 print_logging = False
 
@@ -60,6 +61,13 @@ class Timing(object):
         else:
             self.data[key] = end
         return end
+
+    def log_queries(self):
+        self.data['queries'] = {'time': 0}
+        queries = connections['profiler'].queries
+        self.data['queries']['number'] = len(queries)
+        for query in queries:
+            self.data['queries']['time'] = self.data['queries']['time'] + float(query['time'])
 
     def add_data_to_response(self, response):
         response.content = response.content[:-1] + str.encode(', "timing_data":' + json.dumps(self.data) + '}')

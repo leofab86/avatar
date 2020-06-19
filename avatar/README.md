@@ -1,25 +1,33 @@
 # Todo
-• set up good DNS website name for the EC2 instance
+• set up AWS Auto Scaling and Load Balancer and test
+configurations of this set up with the load test app
 
-• see if you can create separate app that can bombard your
-ec2 server with requests to eventually use in profile app.
-Test it on avatar. Learn about getting access to (real-time?)
-data about AWS EC2 load/performance
+• Build a ui for the load test app
 
 • learn / setup caching
+
+• Move reactserver to separate microservice
+
+• Move db off same machine as server, use AWS service to host
+db on cloud (will probably just create a separate EC2 for that
+because RDS is expensive, or Aurora)
+
+• Set up db and reactserver microservices in VPC. (Add
+logging to them using server timing?)
 
 # Roadmap
 • profiler UI improvements:
     • fix request timer to run based on start time
-    • add learn more modal to custom optimization
+    • add learn more modal to custom optimization and
+    prefetch related, change generic description of 
+    optimizations
     • animate progress bar
     • ReactJsonView code split is creating server bundle 
     as well. Configure to only create client bundle
     
-• Move db off same machine as server, use AWS service to host
-db on cloud
-
-• Move reactserver to separate microservice
+• django code improvements:
+    • change timing logging to a middleware that writes
+    timing data to server timing api header
 
 • portfolio home page is list of large, full width banners
 representing individual parts of my portfolio that will 
@@ -55,10 +63,13 @@ profiles results with some kind of visuals. Examples
 of systems to test:
 [
   • SSR vs SPA
-  • single webserver vs distributed
-  • redis cache
-  • hosted server vs serverless
+  • single webserver vs auto scaling vs load balancer
+  • with or without redis cache, possibly allow config for
+  different caching strategies
+  • hosted django vs serverless (ec2 vs fargate vs lambda)
 ]
+
+• set up good DNS website name for the Django web server
 
 • react-three-fiber and react-spring for banner animations
 

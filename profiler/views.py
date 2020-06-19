@@ -1,12 +1,23 @@
 import asyncio
+import boto3
+import requests
+import json
+from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from profiler.models import DatabaseProfile
 from profiler.serializers import DatabaseProfileSerializer
 from reactserver.views import HybridJsonView
-from common.errorhandling import handle_database_exceptions, request_validation
+from common.errorhandling import handle_database_exceptions, request_validation, generate_error_resp
 from profiler.utils import custom_data_optimization
 from common.logging import logerror, Timing
-from django.db import connections
+
+
+dynamodb = boto3.client(
+    'dynamodb',
+    aws_access_key_id=settings.AWS_ACCESS_KEY,
+    aws_secret_access_key=settings.AWS_SECRET_KEY,
+    region_name=settings.AWS_REGION
+)
 
 
 class IndexView(HybridJsonView):
@@ -89,6 +100,7 @@ def database_profile(request, db_profile_id):
             timing.end('generate_json')
             timing.end('full_api')
             timing.data['custom_optimization'] = custom_optimization_timing_data
+            timing.log_queries()
             timing.add_data_to_response(response)
             return response
 
@@ -132,6 +144,71 @@ def database_profile(request, db_profile_id):
         response = JsonResponse({'db_profile': serializer})
         timing.end('generate_json')
         timing.end('full_api')
+        timing.log_queries()
         timing.add_data_to_response(response)
         return response
 
+
+@request_validation(['POST'])
+def load_test_start(request, test_id):
+    try:
+        dynamodb.put_item(
+            TableName='avatarLoadTest',
+            Item={
+                'test_id': {'S': str(test_id)},
+                'completion': {'N': '0'},
+                'results': {'S': ''},
+            }
+        )
+    except Exception as e:
+        logerror(e)
+        return generate_error_resp(code='DYNAMODB ERROR', message='Error communicating with DynamoDb', status=500)
+
+    loop = asyncio.new_event_loop()
+    async def run_load_test():
+        def try_run_load_test():
+            try:
+                requests.post(
+                    'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
+                    json={'test_id': str(test_id), 'number_of_tests': 300},
+                    headers={'content_type': 'application/json'}
+                )
+                print('finished load test')
+            except Exception as e:
+                logerror(e, message=f'avatarLoadTest lambda error')
+
+        loop.run_in_executor(None, try_run_load_test)
+    asyncio.run(run_load_test())
+    loop.close()
+
+    return JsonResponse({'test_id': test_id})
+
+
+@request_validation(['GET'])
+def load_test_check(request, test_id):
+    response = dynamodb.get_item(
+        TableName='avatarLoadTest',
+        Key={'test_id': {'S': str(test_id)}},
+    )
+    item = response['Item']
+    results = {}
+    if item['completion']['N'] == "100":
+        results['data'] = []
+        results['data'].append(json.loads(item['batch_1']['S']))
+        results['data'].append(json.loads(item['batch_2']['S']))
+        results['data'].append(json.loads(item['batch_3']['S']))
+        results['data'].append(json.loads(item['batch_4']['S']))
+        results['data'].append(json.loads(item['batch_5']['S']))
+        results['data'].append(json.loads(item['batch_6']['S']))
+        results['data'].append(json.loads(item['batch_7']['S']))
+        results['data'].append(json.loads(item['batch_8']['S']))
+        results['data'].append(json.loads(item['batch_9']['S']))
+        results.update(json.loads(item['batch_final']['S']))
+
+    return JsonResponse({
+        'load_test': {
+            'completion': item['completion']['N'],
+            'results': results,
+            'test_id': item['test_id']['S']
+        }
+    })

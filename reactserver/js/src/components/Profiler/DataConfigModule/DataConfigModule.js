@@ -11,7 +11,6 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
     const {deleteDbProfileFromStore, hydrateStore} = useStore();
     const [progress, setProgress] = useState(null);
 
-
     useUpdateSelectedProfile(dbProfiles, setSelectedDbProfile);
 
     const checkProgress = db_profile => {

@@ -180,3 +180,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, f'{REACTSERVER_PATH}/dist'),
 ]
+
+#AWS
+AWS_ACCESS_KEY = config('AWS_ACCESS_KEY')
+
+AWS_SECRET_KEY = config('AWS_SECRET_KEY')
+
+AWS_REGION = config('AWS_REGION')

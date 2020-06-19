@@ -4,6 +4,7 @@ import { BrowserRouter, StaticRouter, Switch, Route } from "react-router-dom";
 import Home from 'components/Home';
 import DetailsPage from "components/DetailsPage";
 import Profiler from "components/Profiler";
+import LoadTest from "components/Profiler/LoadTest"
 import GlobalModal from "components/GlobalModal";
 import { StoreProvider } from 'store'
 
@@ -31,6 +32,10 @@ export default function App ({ store, staticRouterProps }) {
 
                     <Route path='/profiler' exact>
                         <Profiler />
+                    </Route>
+
+                    <Route path='/profiler/load_test' exact>
+                        <LoadTest />
                     </Route>
                 </Switch>
             )}
