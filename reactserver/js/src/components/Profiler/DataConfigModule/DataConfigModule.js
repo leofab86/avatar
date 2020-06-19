@@ -11,7 +11,6 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
     const {deleteDbProfileFromStore, hydrateStore} = useStore();
     const [progress, setProgress] = useState(null);
 
-
     useUpdateSelectedProfile(dbProfiles, setSelectedDbProfile);
 
     const checkProgress = db_profile => {
@@ -82,7 +81,7 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
                 </select>
                 <button className={'profilerButton'} type='button' onClick={deleteProfile}>Delete Profile</button>
                 <span className={styles.modelNumbers}>
-                    {
+                    {selectedDbProfile &&
                          `( teachers: ${selectedDbProfile.teachers
                              }, classes: ${selectedDbProfile.classes
                              }, students: ${selectedDbProfile.students} )`

@@ -3,6 +3,17 @@ import Cookie from 'js-cookie';
 import { useStore } from 'store';
 
 
+
+function buildQueryParams(params) {
+    let queryParams = '?';
+    for (const paramKey in params) {
+        if (params[paramKey]) {
+            queryParams += `${paramKey}=${params[paramKey]}&`
+        }
+    }
+    return queryParams
+}
+
 export const useHydrateStoreOnPageLoad = (conditional) => {
     const { hydrateStore } = useStore();
     useEffect(function hydratePageAfterMount () {
@@ -33,29 +44,8 @@ export const checkDatabaseProgress = db_profile_id => {
         .then(r => r.json())
 };
 
-export const getDatabaseProfile = (db_profile_id, {
-    teacherLevels,
-    classLevels,
-    studentLevels,
-    prefetchRelated,
-    customOptimization
-}) => {
-    let queryParams = '?';
-    if(teacherLevels) {
-        queryParams = queryParams + 'teacher_levels=' + teacherLevels + '&'
-    }
-    if(classLevels) {
-        queryParams = queryParams + 'class_levels=' + classLevels + '&'
-    }
-    if(studentLevels) {
-        queryParams = queryParams + 'student_levels=' + studentLevels + '&'
-    }
-    if(prefetchRelated) {
-        queryParams = queryParams + 'prefetch_related=true&'
-    }
-    if(customOptimization) {
-        queryParams = queryParams + 'custom_optimization=true&'
-    }
+export const getDatabaseProfile = (db_profile_id, params) => {
+    const queryParams = buildQueryParams(params);
     return fetch(window.location.origin + '/profiler/database_profile/' + db_profile_id + queryParams, {
       method: 'GET',
       headers: {
@@ -71,4 +61,23 @@ export const deleteDatabaseProfile = db_profile_id => {
           'X-CSRFToken': Cookie.get('csrftoken')
       },
   }).then(r => r.status)
+};
+
+export const loadTestStart = () => {
+    const testId = Date.now();
+    return fetch(window.location.origin + '/profiler/load_test_start/' + testId, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};
+
+export const loadTestCheck = (testId) => {
+    return fetch(window.location.origin + '/profiler/load_test_check/' + testId, {
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
 };
