@@ -28,6 +28,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Application definition
 
+ALLOWED_HOSTS = ['*']
+
 INSTALLED_APPS = [
     'rest_framework',
     'common.apps.CommonConfig',
