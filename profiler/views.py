@@ -1,4 +1,3 @@
-import asyncio
 import boto3
 import requests
 import json
@@ -10,6 +9,7 @@ from reactserver.views import HybridJsonView
 from common.errorhandling import handle_database_exceptions, request_validation, generate_error_resp
 from profiler.utils import custom_data_optimization
 from common.logging import logerror, timing
+from common.utils import run_async_coroutine
 
 
 dynamodb = boto3.client(
@@ -45,20 +45,13 @@ def create_database_profile(request, body):
     # and also runs it asynchronously in the background so the simple new_profile can be returned with its
     # db_profile_id and the front end can make subsequent calls to check on the completion_progress of new_profile
     # while save_sets() is running.
-    loop = asyncio.new_event_loop()
-    async def save_sets():
-        def try_save_sets():
-            try:
-                new_profile.save_sets()
-            except Exception as e:
-                logerror(e, message=f'{new_profile.db_profile_id} save_sets error')
-        loop.run_in_executor(None, try_save_sets)
-    asyncio.run(save_sets())
-    # Closing the loop here causes an error when the async thread completes because it runs some code that checks
-    # whether it is already closed. This error doesn't cause any problems because nothing is waiting on the loop.
-    # So I prefer the error than potentially leaking resources from not closing the loop?
-    # TODO: Figure out how to avoid this
-    loop.close()
+    def save_sets():
+        try:
+            new_profile.save_sets()
+        except Exception as e:
+            logerror(e, message=f'{new_profile.db_profile_id} save_sets error')
+
+    run_async_coroutine(save_sets)
 
     return JsonResponse({'db_profile': DatabaseProfileSerializer(new_profile).data})
 
@@ -153,22 +146,18 @@ def load_test_start(request, test_id):
         logerror(e)
         return generate_error_resp(code='DYNAMODB ERROR', message='Error communicating with DynamoDb', status=500)
 
-    loop = asyncio.new_event_loop()
-    async def run_load_test():
-        def try_run_load_test():
-            try:
-                requests.post(
-                    'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
-                    json={'test_id': str(test_id), 'number_of_tests': 10},
-                    headers={'content_type': 'application/json'}
-                )
-                print('finished load test')
-            except Exception as e:
-                logerror(e, message=f'avatarLoadTest lambda error')
+    def run_load_test():
+        try:
+            requests.post(
+                'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
+                json={'test_id': str(test_id), 'number_of_tests': 10},
+                headers={'content_type': 'application/json'}
+            )
+            print('finished load test')
+        except Exception as e:
+            logerror(e, message=f'avatarLoadTest lambda error')
 
-        loop.run_in_executor(None, try_run_load_test)
-    asyncio.run(run_load_test())
-    loop.close()
+    run_async_coroutine(run_load_test)
 
     return JsonResponse({'test_id': test_id})
 
