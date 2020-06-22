@@ -26,8 +26,9 @@ developmentMode && (
 )
 
 app.post('/render-react', function renderHome (req, res) {
+  const start = Date.now();
   const body = req.body;
-  const data = {};
+  let data = {};
   for(const key in body) {
       try {
           data[key] = JSON.parse(body[key])
@@ -41,9 +42,15 @@ app.post('/render-react', function renderHome (req, res) {
     context: {}
   };
 
+  const html = ReactDOMServer.renderToString(<App store={data} staticRouterProps={staticRouterProps}/>);
+  data = JSON.stringify(data)
+
+  const description = 'reactserver-node-exec'
+  res.setHeader('Server-Timing', `${description};dur=${Date.now() - start};desc="${description}";start=${start}`);
+
   res.json({
-    html: ReactDOMServer.renderToString(<App store={data} staticRouterProps={staticRouterProps}/>),
-    data: JSON.stringify(data),
+    html,
+    data,
     title: body.title,
   })
 })
