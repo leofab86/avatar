@@ -9,7 +9,7 @@ from profiler.serializers import DatabaseProfileSerializer
 from reactserver.views import HybridJsonView
 from common.errorhandling import handle_database_exceptions, request_validation, generate_error_resp
 from profiler.utils import custom_data_optimization
-from common.logging import logerror, Timing
+from common.logging import logerror, timing
 
 
 dynamodb = boto3.client(
@@ -72,10 +72,9 @@ def check_progress(request, db_profile_id):
     return JsonResponse({'db_profile': DatabaseProfileSerializer(db_profile).data})
 
 
+@timing('database_profile', log_queries=True, timing_to_json=True)
 @request_validation(['GET', 'DELETE'])
-def database_profile(request, db_profile_id):
-    timing = Timing('database_profile')
-    timing.start('full_api')
+def database_profile(request, db_profile_id, timer):
     if request.method == 'DELETE':
         try:
             db_profile = DatabaseProfile.objects.get(db_profile_id=db_profile_id)
@@ -92,16 +91,12 @@ def database_profile(request, db_profile_id):
         custom_optimization = request.GET.get('custom_optimization')
 
         if custom_optimization:
-            db_profile, custom_optimization_timing_data = custom_data_optimization(
-                db_profile_id, teacher_levels, class_levels, student_levels
+            timer.apply_context('custom_optimization')
+            db_profile = custom_data_optimization(
+                db_profile_id, teacher_levels, class_levels, student_levels, timer
             )
-            timing.start('generate_json')
-            response = JsonResponse({'db_profile': [db_profile]})
-            timing.end('generate_json')
-            timing.end('full_api')
-            timing.data['custom_optimization'] = custom_optimization_timing_data
-            timing.log_queries()
-            timing.add_data_to_response(response)
+            with timer.run('generate_json'):
+                response = JsonResponse({'db_profile': [db_profile]})
             return response
 
         prefetch_related_args = ()
@@ -129,24 +124,18 @@ def database_profile(request, db_profile_id):
         except DatabaseProfile.DoesNotExist:
             return HttpResponse(status=404)
 
-        timing.start('db_profile_query_and_serialize')
-        serializer = DatabaseProfileSerializer(
-            db_profile,
-            many=True,
-            student_levels=student_levels,
-            class_levels=class_levels,
-            teacher_levels=teacher_levels
-        ).data
-        timing_data_context = 'prefetch_related' if prefetch_related else None
-        timing.end('db_profile_query_and_serialize', timing_data_context)
+        with timer.apply_context('prefetch_related' if prefetch_related else None)\
+                .run('db_profile_query_and_serialize'):
+            serializer = DatabaseProfileSerializer(
+                db_profile,
+                many=True,
+                student_levels=student_levels,
+                class_levels=class_levels,
+                teacher_levels=teacher_levels
+            ).data
 
-        timing.start('generate_json')
-        response = JsonResponse({'db_profile': serializer})
-        timing.end('generate_json')
-        timing.end('full_api')
-        timing.log_queries()
-        timing.add_data_to_response(response)
-        return response
+        with timer.run('generate_json'):
+            return JsonResponse({'db_profile': serializer})
 
 
 @request_validation(['POST'])
@@ -170,7 +159,7 @@ def load_test_start(request, test_id):
             try:
                 requests.post(
                     'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
-                    json={'test_id': str(test_id), 'number_of_tests': 300},
+                    json={'test_id': str(test_id), 'number_of_tests': 10},
                     headers={'content_type': 'application/json'}
                 )
                 print('finished load test')
