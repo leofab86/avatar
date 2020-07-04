@@ -73,8 +73,8 @@ export const loadTestStart = () => {
     }).then(r => r.json())
 };
 
-export const loadTestCheck = (testId) => {
-    return fetch(window.location.origin + '/profiler/load_test_check/' + testId, {
+export const loadTestCheck = (testId, batchRequest) => {
+    return fetch(window.location.origin + `/profiler/load_test_check/${testId}/${batchRequest}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': Cookie.get('csrftoken')

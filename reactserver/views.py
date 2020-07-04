@@ -51,4 +51,10 @@ class HybridJsonView(View):
 
         response['Server-Timing'] = res.headers['Server-Timing']
 
+        if not settings.DEBUG:
+            try:
+                response['Instance-Id'] = requests.get('http://169.254.169.254/latest/meta-data/instance-id').text
+            except:
+                '''do nothing'''
+
         return response

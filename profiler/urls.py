@@ -10,5 +10,5 @@ urlpatterns = [
     path('check_progress/<int:db_profile_id>', views.check_progress),
     path('database_profile/<int:db_profile_id>', views.database_profile, name='database_profile'),
     path('load_test_start/<int:test_id>', views.load_test_start),
-    path('load_test_check/<int:test_id>', views.load_test_check),
+    path('load_test_check/<int:test_id>/<str:batch>', views.load_test_check),
 ]

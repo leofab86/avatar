@@ -1,6 +1,7 @@
 import boto3
 import requests
 import json
+import time
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from profiler.models import DatabaseProfile
@@ -133,24 +134,11 @@ def database_profile(request, db_profile_id, timer):
 
 @request_validation(['POST'])
 def load_test_start(request, test_id):
-    try:
-        dynamodb.put_item(
-            TableName='avatarLoadTest',
-            Item={
-                'test_id': {'S': str(test_id)},
-                'completion': {'N': '0'},
-                'results': {'S': ''},
-            }
-        )
-    except Exception as e:
-        logerror(e)
-        return generate_error_resp(code='DYNAMODB ERROR', message='Error communicating with DynamoDb', status=500)
-
     def run_load_test():
         try:
             requests.post(
                 'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
-                json={'test_id': str(test_id), 'number_of_tests': 10},
+                json={'test_id': str(test_id), 'tests_per_second': 40, 'seconds': 600},
                 headers={'content_type': 'application/json'}
             )
             print('finished load test')
@@ -163,30 +151,46 @@ def load_test_start(request, test_id):
 
 
 @request_validation(['GET'])
-def load_test_check(request, test_id):
-    response = dynamodb.get_item(
-        TableName='avatarLoadTest',
-        Key={'test_id': {'S': str(test_id)}},
+def load_test_check(request, test_id, batch):
+    dynamodb.update_item(
+        TableName='avatarLoadTest3',
+        Key={
+            'test_id': {'S': str(test_id)},
+            'batch': {'S': 'status'},
+        },
+        UpdateExpression='set latest_status_check=:c',
+        ExpressionAttributeValues={
+            ':c': {'S': str(time.time() * 1000)},
+        }
     )
-    item = response['Item']
-    results = {}
-    if item['completion']['N'] == "100":
-        results['data'] = []
-        results['data'].append(json.loads(item['batch_1']['S']))
-        results['data'].append(json.loads(item['batch_2']['S']))
-        results['data'].append(json.loads(item['batch_3']['S']))
-        results['data'].append(json.loads(item['batch_4']['S']))
-        results['data'].append(json.loads(item['batch_5']['S']))
-        results['data'].append(json.loads(item['batch_6']['S']))
-        results['data'].append(json.loads(item['batch_7']['S']))
-        results['data'].append(json.loads(item['batch_8']['S']))
-        results['data'].append(json.loads(item['batch_9']['S']))
-        results.update(json.loads(item['batch_final']['S']))
+    response = dynamodb.query(
+        TableName='avatarLoadTest3',
+        KeyConditionExpression='test_id = :id and #_batch_ = :b',
+        ExpressionAttributeValues={
+            ':id': {'S': str(test_id)},
+            ':b': {'S': batch}
+        },
+        ExpressionAttributeNames={
+            '#_batch_': 'batch'
+        }
+    )
+    items = response['Items']
+    results = []
+    total = None
+    completion = 0
+    for batch_result in items:
+        if batch_result['batch']['S'] == 'final':
+            completion = 100
+        total = batch_result['total_batches']['N']
+        results.append(json.loads(batch_result['data']['S']))
+
+    if total and completion != 100:
+        completion = int(int(batch) / int(total) * 100)
 
     return JsonResponse({
         'load_test': {
-            'completion': item['completion']['N'],
+            'completion': completion,
             'results': results,
-            'test_id': item['test_id']['S']
+            'test_id': test_id
         }
     })
