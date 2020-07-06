@@ -1,15 +1,19 @@
 import React, {useState, useLayoutEffect, useRef} from 'react';
+import cn from 'classnames';
 import { loadTestStart, loadTestCheck } from 'actions/api';
+import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
 import styles from './styles.scss'
 
 
-export default function LoadTest () {
+export default function LoadTestModule () {
     const [graph, setGraph] = useState([]);
     const [highestAverage, setHighestAverage] = useState(0);
     const graphRef = useRef(null);
 
     useLayoutEffect(() => {
-        graphRef.current.scrollLeft = graphRef.current.scrollWidth
+        if(graphRef.current) {
+            graphRef.current.scrollLeft = graphRef.current.scrollWidth
+        }
     }, [graph])
 
     function checkProgress(testId, batchRequest) {
@@ -55,7 +59,11 @@ export default function LoadTest () {
     }
 
     return (
-        <div>
+        <ProfilerModule title={'Load Test'}>
+            <div>
+                <p>Todo: load test configs...</p>
+            </div>
+
             <button onClick={runLoadTest}>Start Load Test</button>
 
             <div ref={graphRef} className={styles.graph}>
@@ -64,7 +72,7 @@ export default function LoadTest () {
                         <div onClick={() => console.log(dataSet)} key={i} className={styles.dataPoint} style={{
                             height: `${dataSet.average / highestAverage * 240}px`
                         }}>
-                            <div className={`${styles.dataPointPopup} ${styles.dataPointPopupHovered}`}>
+                            <div className={cn(styles.dataPointPopup, styles.dataPointPopupHovered)}>
                                 {dataSet.average}
                             </div>
                         </div>
@@ -72,6 +80,6 @@ export default function LoadTest () {
                 }
 
             </div>
-        </div>
+        </ProfilerModule>
     )
 }

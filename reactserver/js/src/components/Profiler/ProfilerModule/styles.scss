@@ -1,0 +1,24 @@
+@import '~components/Profiler/common';
+
+.profilerModule {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.profilerModuleBar {
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $profilerModuleBorder;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.profilerModuleChildContainer {
+  padding: 0 20px 20px 20px;
+  margin: -4px 2px 0 2px;
+  border: 1px solid $profilerModuleBorder;
+  border-radius: 4px;
+}

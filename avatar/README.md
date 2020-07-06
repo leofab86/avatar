@@ -1,5 +1,5 @@
 # Todo
-• Build a ui for the load test app
+• Build a ui for the load test app.
 
 • learn / setup caching
 
@@ -18,6 +18,8 @@ logging to them using server timing?)
     • add learn more modal to custom optimization and
     prefetch related, change generic description of 
     optimizations
+    • Make Query Optimization request data results scroll to
+    "Inspect the data" section on completion
     • animate progress bar
     • ReactJsonView code split is creating server bundle 
     as well. Configure to only create client bundle
