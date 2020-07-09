@@ -24,6 +24,13 @@
   }
 }
 
+.failures {
+  background-color: red;
+  width: 5px;
+  position: absolute;
+  left: 0;
+}
+
 .dataPointPopup {
   display: none;
   padding: 5px;

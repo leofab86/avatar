@@ -1,7 +1,20 @@
 # Todo
-• Build a ui for the load test app.
+• Build a ui for the load test app. Config for load test should
+include option to choose a page that will be load tested. Config
+gives options for:
+    • amount of data (
+        no data, 
+        small list - list of school systems
+        large list - list of classes
+    )
+    • SSR - with data loaded
+    • SSR - with subsequent api call
+    • SPA - with subsequent api call
+Add option to cache resources
 
 • learn / setup caching
+
+• create caching module
 
 • Move reactserver to separate microservice
 
@@ -11,6 +24,8 @@ because RDS is expensive, or Aurora)
 
 • Set up db and reactserver microservices in VPC. (Add
 logging to them using server timing?)
+
+• Create microservices module 
 
 # Roadmap
 • profiler UI improvements:
@@ -50,15 +65,21 @@ profiles results with some kind of visuals. Examples
 of systems to test:
 [
   • SSR vs SPA
-  • single webserver vs auto scaling vs load balancer
+  • single webserver vs auto scaling
   • with or without redis cache, possibly allow config for
   different caching strategies
-  • hosted django vs serverless (ec2 vs fargate vs lambda)
+  • Microservices architecture
+  • hosted django vs serverless (ec2 vs fargate vs lambda)?
 ]
 
 • profiler app requires login. After login, programatically start
 the ec2 instances necessary for the profiler app so that each user
-has their own playground
+has their own playground.
+    • database models created by user should be accessible only
+    to user. Some database models should be available by default
+    and not able to be deleted 
+    • Load test dynamo tables should be named with reference to
+    user
 
 • set up good DNS website name for the Django web server
 

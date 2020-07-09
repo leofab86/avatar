@@ -134,11 +134,49 @@ def database_profile(request, db_profile_id, timer):
 
 @request_validation(['POST'])
 def load_test_start(request, test_id):
+    dynamodb.create_table(
+        TableName=str(test_id),
+        KeySchema=[
+            {'AttributeName': 'batch', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'batch', 'AttributeType': 'S'},
+        ],
+        BillingMode='PAY_PER_REQUEST'
+    )
+
+    # Test that dynamodb table is ready
+    timeout = 20
+    count = 0
+    successful_query = None
+    while count < timeout:
+        count += 1
+        time.sleep(1)
+        try:
+            successful_query = dynamodb.query(
+                TableName=str(test_id),
+                KeyConditionExpression='#_batch_ = :b',
+                ExpressionAttributeValues={
+                    ':b': {'S': 'b'}
+                },
+                ExpressionAttributeNames={
+                    '#_batch_': 'batch'
+                }
+            )
+        except Exception as e:
+            '''do nothing'''
+
+        if successful_query:
+            break
+
+    if not successful_query:
+        return generate_error_resp(code='DYNAMO_ERROR', message='Error initiating load test', status=400)
+
     def run_load_test():
         try:
             requests.post(
                 'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
-                json={'test_id': str(test_id), 'tests_per_second': 40, 'seconds': 600},
+                json={'test_id': str(test_id), 'tests_per_second': 45, 'seconds': 40},
                 headers={'content_type': 'application/json'}
             )
             print('finished load test')
@@ -153,21 +191,17 @@ def load_test_start(request, test_id):
 @request_validation(['GET'])
 def load_test_check(request, test_id, batch):
     dynamodb.update_item(
-        TableName='avatarLoadTest3',
-        Key={
-            'test_id': {'S': str(test_id)},
-            'batch': {'S': 'status'},
-        },
+        TableName=str(test_id),
+        Key={'batch': {'S': 'status'}},
         UpdateExpression='set latest_status_check=:c',
         ExpressionAttributeValues={
             ':c': {'S': str(time.time() * 1000)},
         }
     )
     response = dynamodb.query(
-        TableName='avatarLoadTest3',
-        KeyConditionExpression='test_id = :id and #_batch_ = :b',
+        TableName=str(test_id),
+        KeyConditionExpression='#_batch_ = :b',
         ExpressionAttributeValues={
-            ':id': {'S': str(test_id)},
             ':b': {'S': batch}
         },
         ExpressionAttributeNames={
@@ -179,12 +213,10 @@ def load_test_check(request, test_id, batch):
     total = None
     completion = 0
     for batch_result in items:
-        if batch_result['batch']['S'] == 'final':
-            completion = 100
         total = batch_result['total_batches']['N']
         results.append(json.loads(batch_result['data']['S']))
 
-    if total and completion != 100:
+    if total:
         completion = int(int(batch) / int(total) * 100)
 
     return JsonResponse({
