@@ -39,7 +39,7 @@ app.post('/render-react', function renderHome (req, res) {
 
   const staticRouterProps = {
     location: data.path,
-    context: {}
+    context: data.static_context
   };
 
   const html = ReactDOMServer.renderToString(<App store={data} staticRouterProps={staticRouterProps}/>);

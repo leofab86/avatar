@@ -1,16 +1,5 @@
 # Todo
-• Build a ui for the load test app. Config for load test should
-include option to choose a page that will be load tested. Config
-gives options for:
-    • amount of data (
-        no data, 
-        small list - list of school systems
-        large list - list of classes
-    )
-    • SSR - with data loaded
-    • SSR - with subsequent api call
-    • SPA - with subsequent api call
-Add option to cache resources
+• Load test module feature - Add option to cache resources?
 
 • learn / setup caching
 
@@ -40,6 +29,8 @@ logging to them using server timing?)
     as well. Configure to only create client bundle
     
 • django code improvements:
+    • make database profile check_progress and load_test_check
+    use websockets instead of repeated server calls
     • change timing logging to a middleware that writes
     timing data to server timing api header
     

@@ -1,3 +1,31 @@
+.pageOptionsContainer {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.pageOptionsList {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.pageOptionsHeader {
+  margin-bottom: 10px;
+}
+
+.pageOptionCheckBox {
+  cursor: pointer;
+}
+
+.pageOptionLabel {
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.previewPageButton {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
 .graph {
   border: 1px solid black;
   margin-top: 30px;

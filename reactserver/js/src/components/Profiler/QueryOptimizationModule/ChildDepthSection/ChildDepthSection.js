@@ -26,7 +26,7 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
 
             <p>
                 Select which pieces of data to retrieve with your query and how deeply to
-                recursively retrieve that data's children.
+                retrieve that data's children.
             </p>
 
             <div className={styles.selectColumn}>

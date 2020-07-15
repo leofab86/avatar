@@ -29,7 +29,8 @@ const _hydrateConfigs = {
         transformer: (store, data) => {
             return {...store, db_profiles: [...store.db_profiles, data]}
         }
-    }
+    },
+    'classes': {}
 };
 
 function _generateHydrateStoreFunctions (setStore) {
@@ -38,7 +39,7 @@ function _generateHydrateStoreFunctions (setStore) {
         const hydrateConfig = _hydrateConfigs[prop];
         hydrateStoreFunctions[prop] = data => setStore(
             prevStoreState => hydrateConfig.transformer
-                ?  hydrateConfig.transformer(prevStoreState, data)
+                ? hydrateConfig.transformer(prevStoreState, data)
                 : ({...prevStoreState, [prop]: data})
         )
     }

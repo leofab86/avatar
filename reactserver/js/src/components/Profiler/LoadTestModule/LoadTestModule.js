@@ -2,14 +2,20 @@ import React, {useState, useLayoutEffect, useRef} from 'react';
 import cn from 'classnames';
 import { loadTestStart, loadTestCheck } from 'actions/api';
 import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
+import PageOptions from "./PageOptions";
 import styles from './styles.scss'
 
 
 export default function LoadTestModule () {
     const [loadTestStatus, setLoading] = useState(false);
+    const [pageType, setPageType] = useState('ssr');
+    const [listSize, setListSize] = useState('none');
+    const [withApi, setWithApi] = useState(false);
     const [graph, setGraph] = useState([]);
     const [highestAverage, setHighestAverage] = useState(0);
     const graphRef = useRef(null);
+
+    const previewConfigUrl = `${pageType}?data_size=${listSize !== 'none' ? `${listSize}&with_api=${pageType === 'spa' || withApi}` : 'none'}`;
 
     useLayoutEffect(() => {
         if(graphRef.current) {
@@ -40,12 +46,11 @@ export default function LoadTestModule () {
                     }
                 })
         }, 1000)
-
     }
 
     function runLoadTest () {
-        setLoading('Creating necessary resources...');
-        loadTestStart()
+        setLoading('Generating resources...');
+        loadTestStart(previewConfigUrl)
             .then(r => {
                 setLoading('Launching load test...');
                 console.log('start: ', r);
@@ -54,12 +59,12 @@ export default function LoadTestModule () {
     }
 
     function calculateAverage(arrayOfRequests) {
-        let sum = 0
-        let failures = 0
+        let sum = 0;
+        let failures = 0;
         arrayOfRequests.forEach(request => {
             if(!request.duration) failures++;
             sum = sum + (request.duration || 10000)
-        })
+        });
         return {average: Math.floor(sum/arrayOfRequests.length), failures}
     }
 
@@ -68,7 +73,7 @@ export default function LoadTestModule () {
             <h3>Auto Scale Load Test</h3>
 
             <p>
-                Now that we've optimized our back-end querying, let's explore how to improve performance when under
+                Now that we've optimized back-end querying, let's explore how to improve performance when under
                 high traffic load.
             </p>
 
@@ -77,19 +82,36 @@ export default function LoadTestModule () {
             <p>
                 An auto scaling setup through AWS is an efficient way to manage high traffic load. Especially when
                 your business needs require bursts of high traffic as opposed to consistent loads on your system.
-                Below, you can configure what type of web-page to load test and preview it. Different configurations
-                have different pros and cons for different business needs (these will be discussed in the configuration
-                section) and these will affect server load times.
+                Below, you can configure what type of web-page to load test. Different configurations
+                have different pros and cons for different business needs and these will affect server load times.
+                Preview the page to get further details and profile the performance implications of your configuration.
             </p>
 
-            <h4>Todo: web-page and load test configs...</h4>
+            <div className={styles.pageOptionsContainer}>
+                <h4 className={styles.pageOptionsHeader}>Select Page Type: </h4>
+                <select value={pageType} onChange={e => setPageType(e.target.value)}>
+                    <option value='ssr'>Server Side Rendering</option>
+                    <option value='spa'>Single Page App</option>
+                </select>
 
-            <div>
-                Options:
-                SSR - with data loaded initially
-                SSR - with subsequent api call to get the data
-                SPA
+                <br/><br/>
 
+                <PageOptions
+                    ssr={pageType === 'ssr'}
+                    setListSize={setListSize}
+                    listSize={listSize}
+                    setWithApi={setWithApi}
+                    withApi={withApi}
+                />
+
+                <a
+                    target='_blank'
+                    href={
+                        `/profiler/preview/${previewConfigUrl}`
+                    }
+                >
+                    <button className={styles.previewPageButton}>Preview Page</button>
+                </a>
             </div>
 
             <p>
