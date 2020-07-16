@@ -62,8 +62,8 @@ def load_test_start(request, test_id):
                 'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
                 json={
                     'test_id': str(test_id),
-                    'tests_per_second': 5,
-                    'seconds': 5,
+                    'tests_per_second': 45,
+                    'seconds': 600,
                     'preview_config_url': request.body.decode('utf-8')
                 },
                 headers={'content_type': 'application/json'}

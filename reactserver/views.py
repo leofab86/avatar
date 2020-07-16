@@ -11,7 +11,7 @@ class HybridJsonView(View):
     def get_content(self, *args, **kwargs):
         return {}
 
-    @timing('profiler')
+    @timing()
     def get(self, request, *args, timer, **kwargs):
         with timer.run('get-content'):
             json_request = request.GET.get('json', 'false')

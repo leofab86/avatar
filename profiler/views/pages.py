@@ -4,6 +4,7 @@ from profiler.serializers import DatabaseProfileSerializer
 from reactserver.views import HybridJsonView
 from django.views.generic.base import TemplateView
 from django.http import JsonResponse, HttpResponseRedirect
+from common.logging import timing
 
 
 class IndexView(HybridJsonView):
@@ -44,15 +45,17 @@ class LoadTestSPAPreview(TemplateView):
     def get_context_data(self):
         return {'title': 'Load Test Preview', 'data': json.dumps({"spa": True})}
 
-    def get(self, request, *args, **kwargs):
+    @timing()
+    def get(self, request, *args, timer, **kwargs):
         json_request = request.GET.get('json', 'false')
         data_size = request.GET.get('data_size', 'none')
         with_api = request.GET.get('with_api', 'true')
 
         if json_request == 'true':
-            context = self.get_context_data()
-            context.update(_get_preview_data(data_size))
-            return JsonResponse(context)
+            with timer.run('get-content'):
+                context = self.get_context_data()
+                context.update(_get_preview_data(data_size))
+                return JsonResponse(context)
 
         if with_api == 'false':
             return HttpResponseRedirect(f'/profiler/preview/spa?data_size={data_size}&with_api=true')

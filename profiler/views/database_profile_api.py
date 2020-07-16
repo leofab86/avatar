@@ -39,7 +39,7 @@ def check_progress(request, db_profile_id):
     return JsonResponse({'db_profile': DatabaseProfileSerializer(db_profile).data})
 
 
-@timing('database_profile', log_queries=True, timing_to_json=True)
+@timing(log_queries=True, timing_to_json=True)
 @request_validation(['GET', 'DELETE'])
 def database_profile(request, db_profile_id, timer):
     if request.method == 'DELETE':

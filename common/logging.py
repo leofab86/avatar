@@ -22,10 +22,9 @@ def logerror(e, *, message='see traceback'):
 
 
 class _Timer(object):
-    def __init__(self, label):
+    def __init__(self):
         self.time_store = {}
         self.data = {}
-        self.label = label
 
     def __getitem__(self, context):
         outer_self = self
@@ -88,10 +87,10 @@ class _Timer(object):
         response['Server-Timing'] = header
 
 
-def timing(label, *, log_queries=False, timing_to_json=False):
+def timing(*, log_queries=False, timing_to_json=False):
     def decorator(func):
         def handler(request, *args, **kwargs):
-            timer = _Timer(label)
+            timer = _Timer()
 
             kwargs['timer'] = timer
 
