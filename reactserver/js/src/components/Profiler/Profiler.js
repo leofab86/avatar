@@ -3,6 +3,7 @@ import { useStore } from 'store';
 import { useHydrateStoreOnPageLoad } from 'actions/api';
 import DataConfigModule from "./DataConfigModule";
 import QueryOptimizationModule from "./QueryOptimizationModule";
+import LoadTestModule from './LoadTestModule';
 import styles from './styles.scss';
 
 
@@ -30,6 +31,8 @@ export default function Profiler () {
                 />
 
                 <QueryOptimizationModule selectedDbProfile={selectedDbProfile}/>
+
+                <LoadTestModule />
             </div>
         </div>
     )

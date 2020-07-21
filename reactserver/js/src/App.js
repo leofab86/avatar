@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, StaticRouter, Switch, Route } from "react-router-dom";
+import qs from 'query-string';
 import Home from 'components/Home';
 import DetailsPage from "components/DetailsPage";
 import Profiler from "components/Profiler";
-import LoadTest from "components/Profiler/LoadTest"
 import GlobalModal from "components/GlobalModal";
+import Preview from "components/Profiler/Preview/Preview"
 import { StoreProvider } from 'store'
 
 
@@ -34,9 +35,22 @@ export default function App ({ store, staticRouterProps }) {
                         <Profiler />
                     </Route>
 
-                    <Route path='/profiler/load_test' exact>
-                        <LoadTest />
+                    <Route path='/profiler/preview/'>
+                        {({ staticContext, location }) => {
+                            const queryParams = staticContext?.query_params
+                                ? staticContext.query_params
+                                : qs.parse(location.search);
+                            return (
+                                <Preview
+                                    spa={store.spa}
+                                    withApi={queryParams.with_api === 'true'}
+                                    dataSize={queryParams.data_size}
+                                />
+                            )
+                        }}
                     </Route>
+
+
                 </Switch>
             )}
             <GlobalModal />
@@ -45,7 +59,11 @@ export default function App ({ store, staticRouterProps }) {
 }
 
 if(typeof window !== 'undefined'){
-    const data = JSON.parse(window.__data__);
+    const data = window.__data__ ? JSON.parse(window.__data__) : {};
     console.log(data);
-    ReactDOM.hydrate(<App store={data}/>, document.getElementById('root'));
+    if(data.spa) {
+        ReactDOM.render(<App store={data}/>, document.getElementById('root'))
+    } else {
+        ReactDOM.hydrate(<App store={data}/>, document.getElementById('root'));
+    }
 }

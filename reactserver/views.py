@@ -11,9 +11,9 @@ class HybridJsonView(View):
     def get_content(self, *args, **kwargs):
         return {}
 
-    @timing('profiler')
+    @timing()
     def get(self, request, *args, timer, **kwargs):
-        with timer.run('get-content'):
+        with timer.run('get-data'):
             json_request = request.GET.get('json', 'false')
 
             content = self.get_content(request, *args, **kwargs)
@@ -50,5 +50,11 @@ class HybridJsonView(View):
             response = HttpResponse(content)
 
         response['Server-Timing'] = res.headers['Server-Timing']
+
+        if not settings.DEBUG:
+            try:
+                response['Instance-Id'] = requests.get('http://169.254.169.254/latest/meta-data/instance-id').text
+            except:
+                '''do nothing'''
 
         return response

@@ -1,0 +1,72 @@
+.pageOptionsContainer {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.pageOptionsList {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.pageOptionsHeader {
+  margin-bottom: 10px;
+}
+
+.pageOptionCheckBox {
+  cursor: pointer;
+}
+
+.pageOptionLabel {
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.previewPageButton {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.graph {
+  border: 1px solid black;
+  margin-top: 30px;
+  height: 300px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  overflow-x: scroll;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.dataPoint {
+  min-width: 5px;
+  border: 1px solid black;
+  background-color: aquamarine;
+  position: relative;
+
+  &:hover {
+    .dataPointPopupHovered {
+      display: block;
+    }
+  }
+}
+
+.failures {
+  background-color: red;
+  width: 5px;
+  position: absolute;
+  left: 0;
+}
+
+.dataPointPopup {
+  display: none;
+  padding: 5px;
+  background-color: #eaddcc;
+  position: absolute;
+  bottom: 0;
+  left: -10px;
+  border: 1px solid black;
+  border-radius: 3px;
+  z-index: 1;
+}

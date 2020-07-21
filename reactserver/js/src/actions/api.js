@@ -18,7 +18,9 @@ export const useHydrateStoreOnPageLoad = (conditional) => {
     const { hydrateStore } = useStore();
     useEffect(function hydratePageAfterMount () {
         if(conditional) {
-            fetch(window.location.href + '?json=true').then(r => r.json())
+            const hasQueryParams = window.location.href.includes('?');
+            fetch(`${window.location.href}${hasQueryParams ? '&' : '?'}json=true`)
+                .then(r => r.json())
                 .then(resp => {
                     for (const key in resp) {
                         hydrateStore[key]?.(resp[key])
@@ -63,18 +65,19 @@ export const deleteDatabaseProfile = db_profile_id => {
   }).then(r => r.status)
 };
 
-export const loadTestStart = () => {
+export const loadTestStart = (previewConfigUrl) => {
     const testId = Date.now();
     return fetch(window.location.origin + '/profiler/load_test_start/' + testId, {
         method: 'POST',
         headers: {
           'X-CSRFToken': Cookie.get('csrftoken')
         },
+        body: previewConfigUrl
     }).then(r => r.json())
 };
 
-export const loadTestCheck = (testId) => {
-    return fetch(window.location.origin + '/profiler/load_test_check/' + testId, {
+export const loadTestCheck = (testId, batchRequest) => {
+    return fetch(window.location.origin + `/profiler/load_test_check/${testId}/${batchRequest}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': Cookie.get('csrftoken')

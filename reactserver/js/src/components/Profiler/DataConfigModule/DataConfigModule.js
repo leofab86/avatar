@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import cn from 'classnames';
 import { useStore } from 'store';
 import { createDatabaseProfile, deleteDatabaseProfile, checkDatabaseProgress } from 'actions/api';
+import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
 import ProgressBar from "../ProgressBar";
 import { useUpdateSelectedProfile } from './hooks';
 import styles from './styles.scss';
@@ -57,7 +58,7 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
             .then(status => status === 200 && deleteDbProfileFromStore(selectedDbProfile.db_profile_id));
 
     return (
-        <div className={cn('profilerModule', styles.dataModelConfigModule)}>
+        <ProfilerModule title={'Configure Your Data Model'}>
             <h3>Data Model Config</h3>
             <p>
                 Create a set of data using a school system model. Choose the number of classes, teachers and
@@ -124,6 +125,6 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
                 </div>
 
             </form>
-        </div>
+        </ProfilerModule>
     )
 }

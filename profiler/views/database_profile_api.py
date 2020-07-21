@@ -1,36 +1,10 @@
-import boto3
-import requests
-import json
-from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from profiler.models import DatabaseProfile
 from profiler.serializers import DatabaseProfileSerializer
-from reactserver.views import HybridJsonView
-from common.errorhandling import handle_database_exceptions, request_validation, generate_error_resp
-from profiler.utils import custom_data_optimization
+from common.errorhandling import handle_database_exceptions, request_validation
+from .database_profile_custom_optimization import custom_data_optimization
 from common.logging import logerror, timing
 from common.utils import run_async_coroutine
-
-
-dynamodb = boto3.client(
-    'dynamodb',
-    aws_access_key_id=settings.AWS_ACCESS_KEY,
-    aws_secret_access_key=settings.AWS_SECRET_KEY,
-    region_name=settings.AWS_REGION
-)
-
-
-class IndexView(HybridJsonView):
-    def get_content(self, request):
-        try:
-            db_profiles = DatabaseProfile.objects.filter(completion_progress=100)
-
-        except DatabaseProfile.DoesNotExist:
-            db_profiles = []
-
-        serializer = DatabaseProfileSerializer(db_profiles, many=True)
-
-        return {'db_profiles': serializer.data, 'title': 'Profiler'}
 
 
 @request_validation(['POST'], expected_body=DatabaseProfileSerializer)
@@ -65,7 +39,7 @@ def check_progress(request, db_profile_id):
     return JsonResponse({'db_profile': DatabaseProfileSerializer(db_profile).data})
 
 
-@timing('database_profile', log_queries=True, timing_to_json=True)
+@timing(log_queries=True, timing_to_json=True)
 @request_validation(['GET', 'DELETE'])
 def database_profile(request, db_profile_id, timer):
     if request.method == 'DELETE':
@@ -129,64 +103,3 @@ def database_profile(request, db_profile_id, timer):
 
         with timer.run('generate_json'):
             return JsonResponse({'db_profile': serializer})
-
-
-@request_validation(['POST'])
-def load_test_start(request, test_id):
-    try:
-        dynamodb.put_item(
-            TableName='avatarLoadTest',
-            Item={
-                'test_id': {'S': str(test_id)},
-                'completion': {'N': '0'},
-                'results': {'S': ''},
-            }
-        )
-    except Exception as e:
-        logerror(e)
-        return generate_error_resp(code='DYNAMODB ERROR', message='Error communicating with DynamoDb', status=500)
-
-    def run_load_test():
-        try:
-            requests.post(
-                'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
-                json={'test_id': str(test_id), 'number_of_tests': 10},
-                headers={'content_type': 'application/json'}
-            )
-            print('finished load test')
-        except Exception as e:
-            logerror(e, message=f'avatarLoadTest lambda error')
-
-    run_async_coroutine(run_load_test)
-
-    return JsonResponse({'test_id': test_id})
-
-
-@request_validation(['GET'])
-def load_test_check(request, test_id):
-    response = dynamodb.get_item(
-        TableName='avatarLoadTest',
-        Key={'test_id': {'S': str(test_id)}},
-    )
-    item = response['Item']
-    results = {}
-    if item['completion']['N'] == "100":
-        results['data'] = []
-        results['data'].append(json.loads(item['batch_1']['S']))
-        results['data'].append(json.loads(item['batch_2']['S']))
-        results['data'].append(json.loads(item['batch_3']['S']))
-        results['data'].append(json.loads(item['batch_4']['S']))
-        results['data'].append(json.loads(item['batch_5']['S']))
-        results['data'].append(json.loads(item['batch_6']['S']))
-        results['data'].append(json.loads(item['batch_7']['S']))
-        results['data'].append(json.loads(item['batch_8']['S']))
-        results['data'].append(json.loads(item['batch_9']['S']))
-        results.update(json.loads(item['batch_final']['S']))
-
-    return JsonResponse({
-        'load_test': {
-            'completion': item['completion']['N'],
-            'results': results,
-            'test_id': item['test_id']['S']
-        }
-    })

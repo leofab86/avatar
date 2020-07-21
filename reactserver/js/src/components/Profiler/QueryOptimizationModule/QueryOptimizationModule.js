@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import cn from 'classnames';
 import { getDatabaseProfile } from 'actions/api';
+import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
 import ReactJsonModal from "./ReactJsonModal";
 import ChildDepthSection from "./ChildDepthSection";
 import LoadingTimer from "./LoadingTimer";
@@ -37,7 +37,7 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
     };
 
     return (
-        <div className={cn('profilerModule', styles.queryOptimizationModule)}>
+        <ProfilerModule title={'Query Optimization'}>
             {!selectedDbProfile ? (
                 <h3>Select or Create a DB Model</h3>
             ) : (
@@ -72,6 +72,6 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
                     {dbProfileJson && <ReactJsonModal dbProfileJson={dbProfileJson}/>}
                 </Fragment>
             )}
-        </div>
+        </ProfilerModule>
     )
 }
