@@ -52,7 +52,7 @@ class LoadTestSPAPreview(TemplateView):
         with_api = request.GET.get('with_api', 'true')
 
         if json_request == 'true':
-            with timer.run('get-content'):
+            with timer.run('get-data'):
                 context = self.get_context_data()
                 context.update(_get_preview_data(data_size))
                 return JsonResponse(context)

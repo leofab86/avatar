@@ -13,7 +13,7 @@ class HybridJsonView(View):
 
     @timing()
     def get(self, request, *args, timer, **kwargs):
-        with timer.run('get-content'):
+        with timer.run('get-data'):
             json_request = request.GET.get('json', 'false')
 
             content = self.get_content(request, *args, **kwargs)
