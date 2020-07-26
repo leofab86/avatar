@@ -8,7 +8,7 @@ import styles from './styles.scss'
 
 export default function Preview ({ spa, withApi, dataSize }) {
     const {getFromStore} = useStore();
-    const [perf, setPerf] = useState(null);
+    const [perf, setPerf] = useState({});
 
     const data = getFromStore(dataSize === 'small' ? 'db_profiles' : 'classes');
 
@@ -126,12 +126,10 @@ export default function Preview ({ spa, withApi, dataSize }) {
 
                     <br/>
 
-                    {perf && (
-                        <div>
-                            {perf.fcp && <p><strong>First Contentful Paint:</strong> {perf.fcp}</p>}
-                            {perf.fmp && <p><strong>First Meaningful Paint:</strong> {perf.fmp}</p>}
-                        </div>
-                    )}
+                    <div>
+                        {<p><strong>First Contentful Paint:</strong> {perf.fcp}</p>}
+                        {(withApi) && <p><strong>First Meaningful Paint:</strong> {perf.fmp}</p>}
+                    </div>
 
                 </div>
             </div>

@@ -1,4 +1,6 @@
 import json
+import requests
+from django.conf import settings
 from profiler.models import DatabaseProfile, Class
 from profiler.serializers import DatabaseProfileSerializer
 from reactserver.views import HybridJsonView
@@ -55,7 +57,14 @@ class LoadTestSPAPreview(TemplateView):
             with timer.run('get-data'):
                 context = self.get_context_data()
                 context.update(_get_preview_data(data_size))
-                return JsonResponse(context)
+                response = JsonResponse(context)
+                if not settings.DEBUG:
+                    try:
+                        response['Instance-Id'] = requests.get(
+                            'http://169.254.169.254/latest/meta-data/instance-id').text
+                    except:
+                        '''do nothing'''
+                return response
 
         if with_api == 'false':
             return HttpResponseRedirect(f'/profiler/preview/spa?data_size={data_size}&with_api=true')

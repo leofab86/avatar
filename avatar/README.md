@@ -24,6 +24,12 @@ logging to them using server timing?)
     optimizations
     • Make Query Optimization request data results scroll to
     "Inspect the data" section on completion
+    • Improve load test graph:
+        • make it a separate component
+        • make interactable json view of data
+        • make it stop auto scroll when user scroll away
+        from end, and restart auto scroll when user scrolls
+        back to end
     • animate progress bar
     • ReactJsonView code split is creating server bundle 
     as well. Configure to only create client bundle

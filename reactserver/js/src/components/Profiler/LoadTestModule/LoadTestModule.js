@@ -5,6 +5,8 @@ import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
 import PageOptions from "./PageOptions";
 import styles from './styles.scss'
 
+const autoScaleSystemOrigin = 'http://monolith-auto-scale-test-network-6916b92cd9344764.elb.us-east-1.amazonaws.com';
+const graphTimeMax = 5000;
 
 export default function LoadTestModule () {
     const [loadTestStatus, setLoading] = useState(false);
@@ -14,6 +16,8 @@ export default function LoadTestModule () {
     const [graph, setGraph] = useState([]);
     const [highestAverage, setHighestAverage] = useState(0);
     const graphRef = useRef(null);
+
+    const usesApi = withApi || pageType === 'spa';
 
     const previewConfigUrl = `${pageType}?data_size=${listSize !== 'none' ? `${listSize}&with_api=${pageType === 'spa' || withApi}` : 'none'}`;
 
@@ -29,14 +33,15 @@ export default function LoadTestModule () {
                 .then(r => {
                     if(r.load_test.results.length) {
                         setLoading('running');
-                        const { average, failures } = calculateAverage(r.load_test.results[0])
+                        const { averageHtml, averageWithJs, averageWithCss, failures } = calculateAverage(r.load_test.results[0])
                         setGraph(prevState => ([
                             ...prevState,
-                            {requests: r.load_test.results[0], average, failures}
+                            {requests: r.load_test.results[0], averageHtml, averageWithJs, averageWithCss, failures}
                         ]));
+                        const averageType = usesApi ? averageWithJs : averageWithCss;
                         setHighestAverage(prevAverage => {
-                            if(average > 3000) return 3000;
-                            return average > prevAverage ? average : prevAverage
+                            if(averageType > graphTimeMax) return graphTimeMax;
+                            return averageType > prevAverage ? averageType : prevAverage
                         })
                     }
                     if(r.load_test.results.length === 0) {
@@ -60,12 +65,21 @@ export default function LoadTestModule () {
 
     function calculateAverage(arrayOfRequests) {
         let sum = 0;
+        let sumWithJs = 0;
+        let sumWithCss = 0;
         let failures = 0;
         arrayOfRequests.forEach(request => {
             if(!request.duration) failures++;
-            sum = sum + (request.duration || 10000)
+            sum = sum + (request.duration || 10000);
+            sumWithJs = sumWithJs + (request.durationWithJs || 10000);
+            sumWithCss = sumWithCss + (request.durationWithCss || 10000)
         });
-        return {average: Math.floor(sum/arrayOfRequests.length), failures}
+        return {
+            averageHtml: Math.floor(sum/arrayOfRequests.length),
+            averageWithJs: Math.floor(sumWithJs/arrayOfRequests.length),
+            averageWithCss: Math.floor(sumWithCss/arrayOfRequests.length),
+            failures
+        }
     }
 
     return (
@@ -106,9 +120,7 @@ export default function LoadTestModule () {
 
                 <a
                     target='_blank'
-                    href={
-                        `/profiler/preview/${previewConfigUrl}`
-                    }
+                    href={`${autoScaleSystemOrigin}/profiler/preview/${previewConfigUrl}`}
                 >
                     <button className={styles.previewPageButton}>Preview Page</button>
                 </a>
@@ -145,16 +157,16 @@ export default function LoadTestModule () {
                     {highestAverage !== 0 &&
                         graph.map((dataSet, i) =>
                             <div onClick={() => console.log(dataSet)} key={i} className={styles.dataPoint} style={{
-                                height: `${dataSet.average / highestAverage * 240}px`
+                                height: `${(usesApi ? dataSet.averageWithJs : dataSet.averageWithCss) / highestAverage * 240}px`
                             }}>
                                 {dataSet.failures > 0 && (
                                     <div className={styles.failures} style={{
                                         height: `${dataSet.failures * 2}px`,
-                                        top: `-${dataSet.failures * 2}px`
+                                        top: `${dataSet.failures * 2}px`
                                     }} />
                                 )}
                                 <div className={cn(styles.dataPointPopup, styles.dataPointPopupHovered)}>
-                                    {dataSet.average}
+                                    {usesApi ? dataSet.averageWithJs : dataSet.averageWithCss}
                                 </div>
                             </div>
                         )
