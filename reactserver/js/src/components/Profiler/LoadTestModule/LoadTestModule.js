@@ -1,5 +1,6 @@
 import React, {useState, useLayoutEffect, useRef} from 'react';
 import cn from 'classnames';
+import { useStore } from 'store';
 import { loadTestStart, loadTestCheck } from 'actions/api';
 import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
 import PageOptions from "./PageOptions";
@@ -17,6 +18,38 @@ export default function LoadTestModule () {
     const [highestAverage, setHighestAverage] = useState(0);
     const graphRef = useRef(null);
 
+    const [ReactJson, setReactJson] = useState(null);
+
+    const { openModal } = useStore();
+
+    const openReactJsonModal = (json) => {
+        function open (ReactJsonModule = ReactJson) {
+            openModal(
+                <ReactJsonModule
+                    src={json}
+                    theme="monokai"
+                    name={'Request Batch'}
+                    collapsed={false}
+                    indentWidth={2}
+                    groupArraysAfterLength={false}
+                    displayObjectSize={true}
+                    displayDataTypes={false}
+                    enableClipboard={false}
+                    shouldCollapse={({name}) => name !== 'Request Batch'}
+                />
+            );
+        }
+        if (!ReactJson) {
+            import('react-json-view').then(ReactJsonModule => {
+                setReactJson(() => ReactJsonModule.default)
+                open(ReactJsonModule.default)
+            })
+        } else {
+            open()
+        }
+    };
+
+
     const usesApi = withApi || pageType === 'spa';
 
     const previewConfigUrl = `${pageType}?data_size=${listSize !== 'none' ? `${listSize}&with_api=${pageType === 'spa' || withApi}` : 'none'}`;
@@ -33,10 +66,10 @@ export default function LoadTestModule () {
                 .then(r => {
                     if(r.load_test.results.length) {
                         setLoading('running');
-                        const { averageHtml, averageWithJs, averageWithCss, failures } = calculateAverage(r.load_test.results[0])
+                        const { averageHtml, averageWithJs, averageWithCss, failures, instances } = calculateAverage(r.load_test.results[0])
                         setGraph(prevState => ([
                             ...prevState,
-                            {requests: r.load_test.results[0], averageHtml, averageWithJs, averageWithCss, failures}
+                            {requests: r.load_test.results[0], averageHtml, averageWithJs, averageWithCss, instances, failures}
                         ]));
                         const averageType = usesApi ? averageWithJs : averageWithCss;
                         setHighestAverage(prevAverage => {
@@ -68,16 +101,21 @@ export default function LoadTestModule () {
         let sumWithJs = 0;
         let sumWithCss = 0;
         let failures = 0;
+        const instances = [];
         arrayOfRequests.forEach(request => {
             if(!request.duration) failures++;
             sum = sum + (request.duration || 10000);
             sumWithJs = sumWithJs + (request.durationWithJs || 10000);
             sumWithCss = sumWithCss + (request.durationWithCss || 10000)
+            if(!instances.includes(request.instance)) {
+                instances.push(request.instance)
+            }
         });
         return {
             averageHtml: Math.floor(sum/arrayOfRequests.length),
             averageWithJs: Math.floor(sumWithJs/arrayOfRequests.length),
             averageWithCss: Math.floor(sumWithCss/arrayOfRequests.length),
+            instances,
             failures
         }
     }
@@ -156,13 +194,13 @@ export default function LoadTestModule () {
                 <div ref={graphRef} className={styles.graph}>
                     {highestAverage !== 0 &&
                         graph.map((dataSet, i) =>
-                            <div onClick={() => console.log(dataSet)} key={i} className={styles.dataPoint} style={{
+                            <div onClick={() => openReactJsonModal(dataSet)} key={i} className={styles.dataPoint} style={{
                                 height: `${(usesApi ? dataSet.averageWithJs : dataSet.averageWithCss) / highestAverage * 240}px`
                             }}>
                                 {dataSet.failures > 0 && (
                                     <div className={styles.failures} style={{
                                         height: `${dataSet.failures * 2}px`,
-                                        top: `${dataSet.failures * 2}px`
+                                        top: '0'
                                     }} />
                                 )}
                                 <div className={cn(styles.dataPointPopup, styles.dataPointPopupHovered)}>

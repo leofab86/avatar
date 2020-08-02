@@ -31,7 +31,7 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
                         console.log(json);
                     }
                     setTimerActive(false);
-                    setJson(json.db_profile[0])
+                    setJson({...json.db_profile[0], timing_data: json.timing_data})
                 }
             });
     };
