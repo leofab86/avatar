@@ -9,9 +9,22 @@
 .globalModal {
   padding: 10px;
   border-radius: 3px;
+  background-color: white;
+  width: 500px;
+  min-height: 219px;
+  max-height: 80%;
+  overflow: scroll;
+  box-shadow: 4px 4px 10px 3px #0000004f;
+  position: relative;
+}
+.reactJsonModal {
   background-color: rgb(39, 40, 34);
   width: 700px;
-  min-height: 219px;
-  max-height: 70%;
-  overflow: scroll;
+}
+.close {
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  font-family: sans-serif;
+  cursor: pointer;
 }

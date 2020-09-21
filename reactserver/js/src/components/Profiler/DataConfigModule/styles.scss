@@ -36,3 +36,11 @@
   flex-direction: row;
   align-items: center;
 }
+.fieldRow {
+  display: flex;
+  flex-direction: row;
+
+  input {
+    margin-left: 10px;
+  }
+}

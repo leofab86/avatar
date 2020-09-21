@@ -65,19 +65,46 @@ export const deleteDatabaseProfile = db_profile_id => {
   }).then(r => r.status)
 };
 
-export const loadTestStart = (previewConfigUrl) => {
+export const loadTestStart = (stackAddress, previewConfigUrl) => {
     const testId = Date.now();
     return fetch(window.location.origin + '/profiler/load_test_start/' + testId, {
         method: 'POST',
         headers: {
           'X-CSRFToken': Cookie.get('csrftoken')
         },
-        body: previewConfigUrl
+        body: JSON.stringify({ previewConfigUrl, stackAddress })
     }).then(r => r.json())
 };
 
 export const loadTestCheck = (testId, batchRequest) => {
     return fetch(window.location.origin + `/profiler/load_test_check/${testId}/${batchRequest}`, {
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};
+
+export const checkUser = () => {
+    return fetch(window.location.origin + '/profiler/check_user_status', {
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};
+
+export const checkUserAndRestartStack = () => {
+    return fetch(window.location.origin + '/profiler/check_user_status_and_restart', {
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+    }).then(r => r.json())
+};
+
+export const turnOffStack = () => {
+    return fetch(window.location.origin + '/profiler/turn_off_stack', {
         method: 'GET',
         headers: {
           'X-CSRFToken': Cookie.get('csrftoken')

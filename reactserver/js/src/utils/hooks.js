@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 
 export function useClickOutside ({container, handler, listenerConditional = true}, dependencies) {
   useEffect(() => {
@@ -12,4 +12,15 @@ export function useClickOutside ({container, handler, listenerConditional = true
       handler()
     }
   }
+}
+
+export function useEffectOnUpdate(fn, inputs) {
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (didMountRef.current)
+      fn();
+    else
+      didMountRef.current = true;
+  }, inputs);
 }

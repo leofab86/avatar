@@ -12,4 +12,7 @@ urlpatterns = [
     path('load_test_check/<int:test_id>/<str:batch>', views.load_test_check),
     path('preview/ssr', views.LoadTestSSRPreview.as_view(), name='preview_ssr'),
     path('preview/spa', views.LoadTestSPAPreview.as_view(), name='preview_spa'),
+    path('check_user_status', views.check_stack),
+    path('check_user_status_and_restart', views.check_stack_and_restart),
+    path('turn_off_stack', views.check_stack_and_turn_off)
 ]

@@ -8,7 +8,7 @@ import { useUpdateSelectedProfile } from './hooks';
 import styles from './styles.scss';
 
 
-export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSelectedDbProfile }) {
+export default function DataConfigModule ({ isOpen, setOpen, dbProfiles, selectedDbProfile, setSelectedDbProfile }) {
     const {deleteDbProfileFromStore, hydrateStore} = useStore();
     const [progress, setProgress] = useState(null);
 
@@ -58,11 +58,13 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
             .then(status => status === 200 && deleteDbProfileFromStore(selectedDbProfile.db_profile_id));
 
     return (
-        <ProfilerModule title={'Configure Your Data Model'}>
+        <ProfilerModule title={'Configure Your Data Model'} isOpen={isOpen} setOpen={setOpen}>
             <h3>Data Model Config</h3>
             <p>
-                Create a set of data using a school system model. Choose the number of classes, teachers and
-                students. With high values, this can generate a pretty complex hierarchical data
+                Create a set of relational data using a school system model (Teachers, Classes, Students), or choose an existing config.
+            </p>
+            <p>
+                With high values, this can generate a pretty complex hierarchical data
                 structure that will affect system performance necessitating thoughtful optimization of your
                 queries.
             </p>
@@ -80,7 +82,7 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
                       </option>
                   )}
                 </select>
-                <button className={'profilerButton'} type='button' onClick={deleteProfile}>Delete Profile</button>
+                {/*<button className={'profilerButton'} type='button' onClick={deleteProfile}>Delete Profile</button>*/}
                 <span className={styles.modelNumbers}>
                     {selectedDbProfile &&
                          `( teachers: ${selectedDbProfile.teachers
@@ -89,29 +91,43 @@ export default function DataConfigModule ({ dbProfiles, selectedDbProfile, setSe
                     }
                 </span>
             </div>
-
             <h4 className={styles.configFormHeader}>Create new config:</h4>
             <form className={styles.configForm} onSubmit={onSubmit}>
-                <label htmlFor="db_profile_name">Database Profile Name</label>
-                <input type="text" id="db_profile_name"/>
 
-                <label htmlFor="classes">Number of Classes</label>
-                <input type="number" id="classes" />
+                <div className={styles.fieldRow}>
+                    <label htmlFor="db_profile_name">Database Profile Name:</label>
+                    <input type="text" id="db_profile_name"/>
+                </div>
 
-                <label htmlFor="class_types">Number of Class Types (maximum 16)</label>
-                <input type="number" id="class_types"/>
+                <div className={styles.fieldRow}>
+                    <label htmlFor="classes">Number of Classes:</label>
+                    <input type="number" id="classes" />
+                </div>
 
-                <label htmlFor="teachers">Number of Teachers</label>
-                <input type="number" id="teachers"/>
+                <div className={styles.fieldRow}>
+                    <label htmlFor="class_types">Number of Class Types (maximum 16):</label>
+                    <input type="number" id="class_types"/>
+                </div>
 
-                <label htmlFor="classes_per_teacher">Classes per Teacher</label>
-                <input type="number" id="classes_per_teacher"/>
+                <div className={styles.fieldRow}>
+                    <label htmlFor="teachers">Number of Teachers:</label>
+                    <input type="number" id="teachers"/>
+                </div>
 
-                <label htmlFor="students">Number of Students</label>
-                <input type="number" id="students"/>
+                <div className={styles.fieldRow}>
+                    <label htmlFor="classes_per_teacher">Classes per Teacher:</label>
+                    <input type="number" id="classes_per_teacher"/>
+                </div>
 
-                <label htmlFor="classes_per_student">Classes per Student</label>
-                <input type="number" id="classes_per_student"/>
+                <div className={styles.fieldRow}>
+                    <label htmlFor="students">Number of Students:</label>
+                    <input type="number" id="students"/>
+                </div>
+
+                <div className={styles.fieldRow}>
+                    <label htmlFor="classes_per_student">Classes per Student:</label>
+                    <input type="number" id="classes_per_student"/>
+                </div>
 
                 <div className={styles.submitRow}>
                     <button

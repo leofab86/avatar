@@ -8,7 +8,7 @@ export default function PageOptions ({ssr, setListSize, listSize, setWithApi, wi
         setter: setListSize,
         state: listSize,
         options: [
-            {label: 'Static Content (no data)', id: 'none_data_checkbox', activeCondition: 'none'},
+            // {label: 'Static Content (no data)', id: 'none_data_checkbox', activeCondition: 'none'},
             {label: 'Small List', id: 'small_data_checkbox', activeCondition: 'small'},
             {label: 'Large List', id: 'large_data_checkbox', activeCondition: 'large'},
         ]
