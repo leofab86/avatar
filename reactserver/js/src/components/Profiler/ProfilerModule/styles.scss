@@ -17,8 +17,12 @@
 }
 
 .profilerModuleChildContainer {
-  padding: 0 20px 20px 20px;
+  padding: 20px;
   margin: -4px 2px 0 2px;
   border: 1px solid $profilerModuleBorder;
   border-radius: 4px;
+
+  h3 {
+    margin-top: 0;
+  }
 }

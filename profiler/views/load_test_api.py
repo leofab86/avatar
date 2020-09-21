@@ -56,19 +56,21 @@ def load_test_start(request, test_id):
     if not successful_query:
         return generate_error_resp(code='DYNAMO_ERROR', message='Error initiating load test', status=400)
 
+    body = json.loads(request.body.decode('utf-8'))
+
     def run_load_test():
         try:
             requests.post(
                 'https://302vob5347.execute-api.us-east-1.amazonaws.com/prod',
                 json={
                     'test_id': str(test_id),
-                    'tests_per_second': 40,
+                    'tests_per_second': 42,
                     'seconds': 600,
-                    'preview_config_url': request.body.decode('utf-8')
+                    'stack_address': body['stackAddress'],
+                    'preview_config_url': body['previewConfigUrl']
                 },
                 headers={'content_type': 'application/json'}
             )
-            print('finished load test')
         except Exception as e:
             logerror(e, message=f'avatarLoadTest lambda error')
 

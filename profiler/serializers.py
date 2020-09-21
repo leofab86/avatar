@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
-from profiler.models.school_system import Student, Teacher, DatabaseProfile, Class
+from .models import Student, Teacher, DatabaseProfile, Class
 
 
 class StudentSerializer(ModelSerializer):

@@ -28,7 +28,8 @@ export default function ReactJsonModal ({ dbProfileJson }) {
             displayDataTypes={false}
             enableClipboard={false}
             shouldCollapse={shouldCollapse}
-        />
+        />,
+        { reactJsonModal: true }
     );
 
     return !ReactJson ? null : (

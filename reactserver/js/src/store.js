@@ -5,6 +5,7 @@ const StoreContext = React.createContext({});
 
 const modalState = {
     Component: null,
+    options: {}
 };
 
 export const StoreProvider = ({ children, store }) => {
@@ -30,7 +31,8 @@ const _hydrateConfigs = {
             return {...store, db_profiles: [...store.db_profiles, data]}
         }
     },
-    'classes': {}
+    'classes': {},
+    'user': {}
 };
 
 function _generateHydrateStoreFunctions (setStore) {
@@ -61,8 +63,9 @@ export const useStore = () => {
         return result
     },
 
-    openModal: Component => setStore(prevState => ({...prevState, modalState: { Component }})),
-    closeModal: () => setStore(prevState => ({...prevState, modalState: { Component: null }})),
+    openModal: (Component, options = {}) =>
+        setStore(prevState => ({...prevState, modalState: { Component, options }})),
+    closeModal: () => setStore(prevState => ({...prevState, modalState: { Component: null, options: {} }})),
 
     hydrateStore: _generateHydrateStoreFunctions(setStore),
 

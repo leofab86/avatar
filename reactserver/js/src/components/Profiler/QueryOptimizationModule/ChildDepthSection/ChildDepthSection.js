@@ -37,7 +37,7 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
                         <option value={0}>Not Included</option>
                         <option value={1}>Only Teachers</option>
                         <option value={2}>Teachers with Classes</option>
-                        <option value={3}>Teachers, Classes, and Students</option>
+                        <option value={3}>Teachers with Classes with Students</option>
                     </select>
                 </span>
                 <span>
@@ -47,7 +47,7 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
                         <option value={0}>Not Included</option>
                         <option value={1}>Only Classes</option>
                         <option value={2}>Classes with Students</option>
-                        <option value={3}>Classes, Students with Classes</option>
+                        <option value={3}>Classes with Students with Classes</option>
                     </select>
                 </span>
                 <span>
@@ -57,7 +57,7 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
                         <option value={0}>Not Included</option>
                         <option value={1}>Only Students</option>
                         <option value={2}>Students with Classes</option>
-                        <option value={3}>Students, Classes with Students</option>
+                        <option value={3}>Students with Classes with Students</option>
                     </select>
                 </span>
             </div>
@@ -65,9 +65,30 @@ export default function ChildDepthSection ({ setQueryConfig, resetJson }) {
             <p>
                 Retrieving nested hierarchical data using common abstractions like ORMs or frameworks without
                 understanding how they structure their database queries can cause N+1 query problems
-                (where a unique query is made for each of the children!) Try to do a request with 3 levels of
-                depth on a large data set to see how inefficient this is. Now try the Prefetch Related option
-                below (this is an ORM configuration that reduces queries by getting related data all at once).
+                (where a unique query is made for each of the children!)
+            </p>
+            <p>
+                Try to do a request with 3 levels of depth for Classes data on a large data set to see how inefficient this is.
+            </p>
+            <p>
+                You
+                will be able to inspect the data after it returns. Note the "timing_data.queries" values. With a large
+                data set and 3 levels of depth, the returned json can be around 4MB, which is not a trivial amount of
+                data to query and serialize.
+            </p>
+            <p>
+                Now try the Prefetch Related option below (this is an ORM configuration that reduces queries by getting
+                related data all at once). Notice the improved time and inspect the "timing_data.queries" of the response to see how this
+                changes.
+            </p>
+            <p>
+                Finally, after extensive profiling, I discovered the biggest cause of the slow requests was actually a popular
+                library that I was using to serialize my json responses. After switching to manual serialization I was able
+                to cut down the request times dramatically. Try out Custom Optimization below with a maxed out data request.
+            </p>
+            <p>
+                This exercise demonstrates the importance of profiling and being able to dig into the details of how
+                common abstractions work, as sometimes even popular libraries and tools may do more harm than good.
             </p>
 
             <div className={styles.checkboxContainer}>

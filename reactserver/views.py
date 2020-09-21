@@ -13,10 +13,18 @@ class HybridJsonView(View):
 
     @timing()
     def get(self, request, *args, timer, **kwargs):
+        content = {}
+        if request.user.username:
+            user = {
+                'username': request.user.username,
+                'server_group_status': request.user.server_group_status,
+                'server_group_address': request.user.server_group_address
+            }
+            content.update({'user': user})
+
         with timer.run('get-data'):
             json_request = request.GET.get('json', 'false')
-
-            content = self.get_content(request, *args, **kwargs)
+            content.update(self.get_content(request, *args, **kwargs))
 
             if json_request == 'true':
                 return JsonResponse(content)
@@ -46,8 +54,8 @@ class HybridJsonView(View):
 
         with timer.run('generate-response'):
             context = res.json()
-            content = loader.render_to_string('reactserver/react-spa.html', context, request)
-            response = HttpResponse(content)
+            html = loader.render_to_string('reactserver/react-spa.html', context, request)
+            response = HttpResponse(html)
 
         response['Server-Timing'] = res.headers['Server-Timing']
 

@@ -3,16 +3,16 @@ import cn from 'classnames';
 import { useStore } from 'store';
 import { loadTestStart, loadTestCheck } from 'actions/api';
 import ProfilerModule from 'components/Profiler/ProfilerModule/ProfilerModule';
+import LearnMoreModal from 'components/LearnMoreModal';
 import PageOptions from "./PageOptions";
 import styles from './styles.scss'
 
-const autoScaleSystemOrigin = 'http://monolith-auto-scale-test-network-6916b92cd9344764.elb.us-east-1.amazonaws.com';
 const graphTimeMax = 5000;
 
-export default function LoadTestModule () {
+export default function LoadTestModule ({ isOpen, setOpen, stackStatus, stackAddress }) {
     const [loadTestStatus, setLoading] = useState(false);
     const [pageType, setPageType] = useState('ssr');
-    const [listSize, setListSize] = useState('none');
+    const [listSize, setListSize] = useState('small');
     const [withApi, setWithApi] = useState(false);
     const [graph, setGraph] = useState([]);
     const [highestAverage, setHighestAverage] = useState(0);
@@ -36,7 +36,8 @@ export default function LoadTestModule () {
                     displayDataTypes={false}
                     enableClipboard={false}
                     shouldCollapse={({name}) => name !== 'Request Batch'}
-                />
+                />,
+                { reactJsonModal: true }
             );
         }
         if (!ReactJson) {
@@ -88,7 +89,7 @@ export default function LoadTestModule () {
 
     function runLoadTest () {
         setLoading('Generating resources...');
-        loadTestStart(previewConfigUrl)
+        loadTestStart(stackAddress, previewConfigUrl)
             .then(r => {
                 setLoading('Launching load test...');
                 console.log('start: ', r);
@@ -120,8 +121,40 @@ export default function LoadTestModule () {
         }
     }
 
+    const loadTestLearnMore = () => openModal(
+        <LearnMoreModal
+            header={'Custom, Serverless Load Test'}
+            content={
+                <React.Fragment>
+                    <p>
+                        This load test is designed using
+                        {' '}<a target='_blank' href='https://aws.amazon.com/lambda/'>AWS Lambda</a> and
+                        {' '}<a target='_blank' href='https://aws.amazon.com/dynamodb/'>Dynamo DB</a>.
+                    </p>
+                    <p>
+                        These are lightweight AWS services that cost very little and yet can handle just about any
+                        functionality traditionally reserved for server instances. Lambda handles the code that you
+                        want to run while Dynamo DB provides persistence.
+                    </p>
+                    <p>
+                        By being serverless and automatically partitioning compute time as necessary, the developer
+                        is saved the dev ops related responsibilities of setting up a server, keeping it running
+                        smoothly and deploying an application. AWS does this for you, leaving the developer to focus on the code.
+                    </p>
+                    <p>
+                        In this case, the AWS Lambda function simply sends out a burst of 42 https requests to a url
+                        on your running stack. Once it gets back the html response, it sends out subsequent requests
+                        for the css and js resources to simulate how a browser would interact with the html.
+                        It records details about the requests and saves them on Dynamo DB, which
+                        are then retrieved here to create the live graph.
+                    </p>
+                </React.Fragment>
+            }
+        />
+    );
+
     return (
-        <ProfilerModule title={'Auto Scale Load Test'}>
+        <ProfilerModule title={'Auto Scale Load Test'} isOpen={isOpen} setOpen={setOpen} stackStatus={stackStatus}>
             <h3>Auto Scale Load Test</h3>
 
             <p>
@@ -132,12 +165,17 @@ export default function LoadTestModule () {
             <h3>Auto Scaling</h3>
 
             <p>
-                An auto scaling setup through AWS is an efficient way to manage high traffic load. Especially when
-                your business needs require bursts of high traffic as opposed to consistent loads on your system.
+                An auto scaling setup through AWS is an efficient way to manage high traffic load.
                 Below, you can configure what type of web-page to load test. Different configurations
                 have different pros and cons for different business needs and these will affect server load times.
                 Preview the page to get further details and profile the performance implications of your configuration.
             </p>
+            <p>
+                (NOTE: the first couple of hits to your server stack tend to be a little slow as there is some warming
+                up the system needs to do. Just request a couple of Previews in quick succession to get more accurate
+                load times)
+            </p>
+            <p>TODO: Make a few automatic requests when user first opens this module to warm it up for them</p>
 
             <div className={styles.pageOptionsContainer}>
                 <h4 className={styles.pageOptionsHeader}>Select Page Type: </h4>
@@ -158,31 +196,32 @@ export default function LoadTestModule () {
 
                 <a
                     target='_blank'
-                    href={`${autoScaleSystemOrigin}/profiler/preview/${previewConfigUrl}`}
+                    href={`${stackAddress}/profiler/preview/${previewConfigUrl}`}
                 >
                     <button className={styles.previewPageButton}>Preview Page</button>
                 </a>
             </div>
 
             <p>
-                Once you are ready you can launch the load test. You will see a real time graph of average request
-                times per second. Each bar of the graph is clickable to get details about that batch of requests, such
-                as the breakdown of timings as the request makes its way through the server.
-                (learn more about profiling server timings)
+                Once you are ready you can launch the load test
+                {' '}<span onClick={loadTestLearnMore} className={styles.learnMore}>(learn more about the custom load test app)</span>.
+                You will see a real time graph of average request times per second. Each bar of the graph is clickable to
+                get details about that batch of requests, such as the breakdown of timings for each request as it makes
+                its way through the server.
             </p>
 
             <p>
-                To see the auto scaling system in action, the load test is 10 minutes long. The auto scaling system
-                starts with one server instance, then as it recognizes the burst of traffic caused by the load test
-                will scale up to 3 server instances. There is about a 5 minute delay before the 2 extra instances come
-                online so you will be able to observe in real time in the graph as request times drop when they come online.
-                (learn more about how the load test is built using AWS Lambda and DynamoDB architecture)
+                The auto scaling system stack responds to this burst of traffic by starting up 2 extra
+                instances to help handle the load. This takes about 5 minutes for the system to trigger an alarm due
+                to the high network traffic and spin up the new servers. So you will be able to see in real-time 5 minutes
+                into the test as the request times drop once the system has scaled up.
             </p>
 
+            <p>TODO: Find a way to streamline this experience, no one wants to wait 5 minutes!!</p>
+
             <p>
-                You don't have to watch the load test for the whole 10 minutes! You can move on to the next module
-                and come back to review the results later, or float the graph window so you can keep an eye
-                on it as you explore the other modules.
+                Try hitting the Preview Page button a couple of times during the load test to experience what this high
+                traffic feels like to the end user. Notice the slower response before the system has scaled up.
             </p>
 
             <button disabled={loadTestStatus} onClick={runLoadTest}>Start Load Test</button>

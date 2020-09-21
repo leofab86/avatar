@@ -8,7 +8,7 @@ import styles from './styles.scss';
 
 let requestId;
 
-export default function QueryOptimizationModule ({ selectedDbProfile }) {
+export default function QueryOptimizationModule ({ selectedDbProfile, isOpen, setOpen }) {
     const [dbProfileJson, setJson] = useState(null);
     const [timerActive, setTimerActive] = useState(false);
     const [queryConfig, setQueryConfig] = useState({});
@@ -37,7 +37,7 @@ export default function QueryOptimizationModule ({ selectedDbProfile }) {
     };
 
     return (
-        <ProfilerModule title={'Query Optimization'}>
+        <ProfilerModule title={'Query Optimization'} isOpen={isOpen} setOpen={setOpen}>
             {!selectedDbProfile ? (
                 <h3>Select or Create a DB Model</h3>
             ) : (

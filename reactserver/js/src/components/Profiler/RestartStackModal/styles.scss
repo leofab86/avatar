@@ -1,0 +1,14 @@
+.restartStackModal {
+  padding: 10px;
+  text-align: center;
+}
+.buttonContainer {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 40px;
+
+  button {
+    width: 140px;
+    cursor: pointer;
+  }
+}
