@@ -112,8 +112,10 @@ def check_stack(request):
         stack = _check_stack(user_model.server_group_id)
         stack_status = stack['status']
         user_model.server_group_status = stack_status
+        user_model.server_group_address = stack['address']
         user_model.save()
         return_obj['server_group_status'] = stack_status
+        return_obj['server_group_address'] = stack['address']
 
         if (
             stack_status != 'DELETE_IN_PROGRESS'
